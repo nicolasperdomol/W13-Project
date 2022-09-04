@@ -11,7 +11,6 @@ class MainContent extends React.Component{
         return(<div className={styles.MainContent}>
             <div className='container'>
             <div className='row'>
-                <div className='col'>My playlist</div>
                 <div className='col'><DiscorgsContent/></div>
             </div>
             </div>

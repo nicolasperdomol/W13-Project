@@ -8,8 +8,9 @@ function App() {
             <div className="row">
                 <div id="navbar" className="col-2">
                     <Navbar/>
+                    <div className='col'>My playlist</div>
                 </div>
-                <div className="col-10">
+                <div className="col">
                     <MainContent/>
                 </div>
             </div>

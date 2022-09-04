@@ -10,7 +10,7 @@ class Navbar extends React.Component{
         return(<div className={styles.Navbar}>
             <div className='container'>
             <div className='row'>
-                <div className='col'>Navbar</div>
+                <div className='col'>Music</div>
             </div>
             </div>
             </div>)
