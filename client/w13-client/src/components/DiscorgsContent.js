@@ -70,7 +70,7 @@ class DiscorgsContent extends React.Component{
             <div className='container'>
             <div className='row'>
                 <div className='col-10 offset-1'>
-                    <div><input value={this.state.inputText} className='form-control' type="text" placeholder='Search...' onChange={this.handleSearch}/></div>
+                    <div><input value={this.state.inputText} className='form-control' type="text" placeholder='Search...' onChange={this.handleSearch} style={{margin:"3% 0% 3% 0%"}}/></div>
                     <div id="album-container" className='container'>
                         <div id="album-container" className='row'>
                             {this.state.albumsJSX}

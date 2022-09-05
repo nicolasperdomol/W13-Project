@@ -40,5 +40,6 @@
     "bootstrap": "^5.2.0",
     "fetch-node": "^0.0.1",
     "jsdoc": "^3.6.11"
-  }
+  },
+  "proxy":"http://localhost:3000"
 }
