@@ -41,5 +41,5 @@
     "fetch-node": "^0.0.1",
     "jsdoc": "^3.6.11"
   },
-  "proxy":"http://localhost:3000"
+  "proxy":"https://api.discogs.com/"
 }

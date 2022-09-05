@@ -12,5 +12,5 @@
     "eslint": "^8.23.0",
     "react": "^18.2.0"
   },
-  "proxy":"http://localhost:3000"
+  "proxy":"https://api.discogs.com/"
 }

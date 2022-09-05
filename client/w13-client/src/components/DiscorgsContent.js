@@ -15,12 +15,9 @@ class DiscorgsContent extends React.Component{
     async componentDidUpdate(prevProps, prevState){
         let url = "https://api.discogs.com/database/search?q="+this.state.inputText+"&format='album'&key=VUOrRLOIOnctmQdwiGKg&secret=YscHuQtQIOwyYKJapjStsQOKtQIfGNvF";
         try{
-            if(prevState.inputText !== this.state.inputText){
-                this.setState({isLoaded:false})
-            }
-            const response = await fetch(url)
-            const json = await response.json();
             if(this.state.data.length === 0){
+                const response = await fetch(url)
+                const json = await response.json();
                 this.setState({
                     data:json,
                     isLoaded:true,
@@ -28,13 +25,15 @@ class DiscorgsContent extends React.Component{
                     this.setState({albumsJSX:this.updateAlbumsJSX()})
                 });
             }else if(prevState.inputText !== this.state.inputText){
+                this.setState({isLoaded:false})
+                const response = await fetch(url)
+                const json = await response.json();
                 this.setState({
                     data:json,
                     isLoaded:true,
                 }, ()=>{
                     this.setState({albumsJSX:this.updateAlbumsJSX()})
                 });
-                
             }
         }catch(e){
             console.error(e)
