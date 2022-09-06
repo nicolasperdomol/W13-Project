@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/role-has-required-aria-props */
 import React from 'react'
 import styles from './css/DiscorgsContent.module.css'
 import jazzBandIMG from '../imgs/jazzBand.svg'
@@ -20,6 +21,7 @@ class DiscorgsContent extends React.Component{
             data:[],
             albumsJSX:(<div className='col' style={{padding:"10%"}}><h1 className='text-center'>What do you want to listen to?</h1><img src={jazzBandIMG} alt="jazz band" /></div>),
             mode:modes.MultipleAlbums,
+            filter:"artist",
             additionalMedia:[]
         }
     }
@@ -27,13 +29,16 @@ class DiscorgsContent extends React.Component{
 
     async componentDidUpdate(prevProps, prevState){
         //TODO: Modify API access, get token and info without sending the key in the URL.
-        let url = "https://api.discogs.com/database/search?q='"+this.state.inputText+"'&format='album'&key=VUOrRLOIOnctmQdwiGKg&secret=YscHuQtQIOwyYKJapjStsQOKtQIfGNvF";
+        let url = "https://api.discogs.com/database/search?artist='"+this.state.inputText+"'&key=VUOrRLOIOnctmQdwiGKg&secret=YscHuQtQIOwyYKJapjStsQOKtQIfGNvF";
+        if(this.state.filter === "album"){
+            url = "https://api.discogs.com/database/search?q='"+this.state.inputText+"'&format='album'&key=VUOrRLOIOnctmQdwiGKg&secret=YscHuQtQIOwyYKJapjStsQOKtQIfGNvF";
+        }
         try{
             let isDataStateEmpty = this.state.data.length === 0;
             let hasInputTextChanged = prevState.inputText !== this.state.inputText;
-            
+            let isEmptyInputText = this.state.inputText.length !== 0;
             //Runs the first time asign JSON to data.
-            if(isDataStateEmpty){
+            if(isDataStateEmpty && isEmptyInputText){
                 const response = await fetch(url)
                 const json = await response.json();
                 this.setState({
@@ -102,7 +107,7 @@ class DiscorgsContent extends React.Component{
     }
 
     handleOnChangeFilter = (event) =>{
-        alert(event.target.checked)
+        this.setState({filter:event.target.value})
     }
 
     multipleAlbumsJSX = () =>{
@@ -150,7 +155,7 @@ class DiscorgsContent extends React.Component{
         return (<><div className='col-3'><img src={this.state.additionalMedia.image} alt="Album cover" /></div>
         <div className='col-9' style={{marginBottom:"9%"}}><div className='container'><div className='row'>album</div><div className='row'>
             <b style={{padding:"0"}}><h1>{this.state.data.title}</h1></b>
-            <div style={{padding:"0"}}>{this.state.data.artists[0].name}</div>
+            <div style={{padding:"0"}}>{this.state.data.artists[0] !== undefined ? this.state.data.artists[0].name : ""}</div>
             </div></div></div>
             <div className='container'><div className='row'>
                 <div className='container'><div className='row'>
@@ -179,11 +184,16 @@ class DiscorgsContent extends React.Component{
             <div className='container'>
             <div className='row'>
                 <div className='col-10 offset-1'>
-                    <div className='container'><div className='row' style={{margin:"3% 0% 3% 0%"}}>
-                        <div className="col-10"><input value={this.state.inputText} className='form-control' type="text" placeholder='Search...' onChange={this.handleSearch}/></div>
-                        <div className="col-2 form-check form-switch align-items-center">
-                            <input name="filter" className="form-check-input" type="checkbox" role="switch" id="filter" onChange={(event)=>{this.handleOnChangeFilter(event)}}/>
-                            <label id='filter' className="form-check-label" htmlFor="filter">by album</label>
+                    <div className='container'>
+                        <div className="row" style={{marginTop:"2%"}}><input value={this.state.inputText} className='form-control' type="text" placeholder='Search...' onChange={this.handleSearch}/></div>
+                        <div className='row' style={{margin:"3% 0% 3% 0%"}}>
+                        <div className='col-1'>Filters: </div>
+                        <div className="col form-check form-switch">
+                            <div className='container'><div className='row'>
+                                <label id="artistLabel" className='col-2'>By artist<input name="filter" className="form-check-input" type="radio" role="switch" id="artist" value={"artist"} onChange={(event)=>{this.handleOnChangeFilter(event)}} checked={this.state.filter==="artist"}/></label>
+                                <label id="albumLabel" className='col-2'>By album<input name="filter" className="form-check-input" type="radio" role="switch" id="album" value={"album"} onChange={(event)=>{this.handleOnChangeFilter(event)}} checked={this.state.filter==="album"}/></label>
+                            </div></div>
+                            
                         </div>
                     </div></div>
                     <div id="album-container" className={"container " + this.state.isLoaded?" opacity-100":"opacity-50"}>
