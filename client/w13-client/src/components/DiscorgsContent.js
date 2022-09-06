@@ -129,7 +129,7 @@ class DiscorgsContent extends React.Component{
                     albumJSXArray.push(<div style={{margin:"5% 0 5% 0"}}  key={result.id} className='col-3' onMouseOver={(event)=>{this.handleOnMouseOverAlbum(event)}} onMouseOut={(event)=>{this.handleOnMouseOutAlbum(event)}}>
                         <button key={"albumsContainer"} style={{border:"none", backgroundColor:"transparent", color:"white"}} onClick={(event)=>{this.handleOnClickAlbum(event)}}><div className='container'>
                             <input id="masterId" type="hidden" value={result.master_id}/>
-                            <div className='row'><img style={{maxWidth:"171px", maxHeight:"171px"}} src={result.thumb} alt={result.title} onError={(event)=>{event.target.src = "https://user-images.githubusercontent.com/101482/29592647-40da86ca-875a-11e7-8bc3-941700b0a323.png"}}/></div>
+                            <div className='row'><img style={{maxWidth:"171px", maxHeight:"171px"}} src={result.thumb} alt={result.title} onError={(event)=>{event.target.src = "https://user-images.githubusercontent.com/101482/29592647-40da86ca-875a-11e7-8bc3-941700b0a323.png"}}/><button className='btn btn-success' style={{borderRadius:"100%", width:"40px", height:"40px", position:"absolute"}}>+</button></div>
                             <div className='row text-justify' style={{marginTop:'10%'}}><b>{result.title}</b></div>
                         </div></button>
                     </div>)
