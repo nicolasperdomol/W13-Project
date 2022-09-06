@@ -3,32 +3,47 @@ import styles from './css/DiscorgsContent.module.css'
 import jazzBandIMG from '../imgs/jazzBand.svg'
 import {DiscorgsContentModes as modes} from './componentEnums'
 class DiscorgsContent extends React.Component{
+    /**
+     * @param {*} props Properties of React component
+     * @property {string} inputText Text typed by the user in the search bar client application.
+     * @property {boolean} isLoaded Indicates if the app did received all the data from a previous fetch or not.
+     * @property {array} data Holds the information retrieved from a fetch request as JSON.
+     * @property {JSX} albumsJSX Main source of what we will display to the user, depends on [data] and [mode].
+     * @property {enum} mode Affects albumsJSX in the way we will display the information [MultipleAlbums: in a grid with 4 columns / SingleAlbum: col-12 full width of the page]
+     * @property {string} additionalMedia Images and other relevant data that are not found in the new data.
+     */
     constructor(props){
         super(props);
         this.state = {
             inputText:"",
             isLoaded:true,
-            mode:modes.MultipleAlbums,
             data:[],
-            albumsJSX:(<div className='col' style={{padding:"10%"}}><h1 className='text-center'>What do you want to listen to?</h1><img src={jazzBandIMG} alt="jazz band" /></div>)
+            albumsJSX:(<div className='col' style={{padding:"10%"}}><h1 className='text-center'>What do you want to listen to?</h1><img src={jazzBandIMG} alt="jazz band" /></div>),
+            mode:modes.MultipleAlbums,
+            additionalMedia:[]
         }
     }
 
 
     async componentDidUpdate(prevProps, prevState){
-        //TODO: See if I can access to the content without sending the key in the URL.
-        let url = "https://api.discogs.com/database/search?q="+this.state.inputText+"&format='album'&key=VUOrRLOIOnctmQdwiGKg&secret=YscHuQtQIOwyYKJapjStsQOKtQIfGNvF";
+        //TODO: Modify API access, get token and info without sending the key in the URL.
+        let url = "https://api.discogs.com/database/search?q='"+this.state.inputText+"'&format='album'&key=VUOrRLOIOnctmQdwiGKg&secret=YscHuQtQIOwyYKJapjStsQOKtQIfGNvF";
         try{
-            if(this.state.data.length === 0){
+            let isDataStateEmpty = this.state.data.length === 0;
+            let hasInputTextChanged = prevState.inputText !== this.state.inputText;
+            
+            //Runs the first time asign JSON to data.
+            if(isDataStateEmpty){
                 const response = await fetch(url)
                 const json = await response.json();
                 this.setState({
                     data:json,
                     isLoaded:true,
                 }, ()=>{
+                    //Runs only AFTER this.setState has finished, similar to await this.setState
                     this.setState({albumsJSX:this.updateAlbumsJSX()})
                 });
-            }else if(prevState.inputText !== this.state.inputText){
+            }else if(hasInputTextChanged){
                 if(this.state.mode !== modes.MultipleAlbums){
                     //If the user type something different in the search bar, set mode to multiple albums
                     this.setState({mode:modes.MultipleAlbums});
@@ -50,6 +65,10 @@ class DiscorgsContent extends React.Component{
         }
     }
 
+    /**
+     * 
+     * @param {object} event 
+     */
     handleSearch = (event) => {
         this.setState({inputText:event.target.value})
     }
@@ -64,19 +83,26 @@ class DiscorgsContent extends React.Component{
 
     handleOnClickAlbum = async(event) =>{
         let masterId = event.currentTarget.children.item(0).children.item(0).value;  // Button >> Div >> Input.value
+        let thumbSource = event.currentTarget.children.item(0).children.item(1).children.item(0).src; //Button >> Div >> Div >> Image >> Src
         
         let url = "https://api.discogs.com/masters/" + masterId;
         try {
             const response = await fetch(url)
             const json = await response.json();
+
             this.setState({
                 data:json,
                 mode:modes.SingleAlbum,
+                additionalMedia: {image:thumbSource}
             })
 
         } catch (e) {
             console.error(e);
         }
+    }
+
+    handleOnChangeFilter = (event) =>{
+        alert(event.target.checked)
     }
 
     multipleAlbumsJSX = () =>{
@@ -98,7 +124,7 @@ class DiscorgsContent extends React.Component{
                     albumJSXArray.push(<div style={{margin:"5% 0 5% 0"}}  key={result.id} className='col-3' onMouseOver={(event)=>{this.handleOnMouseOverAlbum(event)}} onMouseOut={(event)=>{this.handleOnMouseOutAlbum(event)}}>
                         <button key={"albumsContainer"} style={{border:"none", backgroundColor:"transparent", color:"white"}} onClick={(event)=>{this.handleOnClickAlbum(event)}}><div className='container'>
                             <input id="masterId" type="hidden" value={result.master_id}/>
-                            <div className='row'><img src={result.thumb} alt={result.title} onError={(event)=>{event.target.src = "https://user-images.githubusercontent.com/101482/29592647-40da86ca-875a-11e7-8bc3-941700b0a323.png"}}/></div>
+                            <div className='row'><img style={{maxWidth:"171px", maxHeight:"171px"}} src={result.thumb} alt={result.title} onError={(event)=>{event.target.src = "https://user-images.githubusercontent.com/101482/29592647-40da86ca-875a-11e7-8bc3-941700b0a323.png"}}/></div>
                             <div className='row text-justify' style={{marginTop:'10%'}}><b>{result.title}</b></div>
                         </div></button>
                     </div>)
@@ -113,14 +139,34 @@ class DiscorgsContent extends React.Component{
         }
     }
 
+    singleAlbumJSX = () =>{
+        let tracklist = []
+        let index = 1;
+        this.state.data.tracklist?.forEach(track => {
+            tracklist.push(<div className='container' style={{marginTop:"0.5%"}} key={track.title}><div className='row'><div className='col-1'>{index}</div><div className='col'><b>{track.title}</b></div><div className='col-1 align-self-end'>{track.duration}</div></div></div>)
+            index++;
+        });
+
+        return (<><div className='col-3'><img src={this.state.additionalMedia.image} alt="Album cover" /></div>
+        <div className='col-9' style={{marginBottom:"9%"}}><div className='container'><div className='row'>album</div><div className='row'>
+            <b style={{padding:"0"}}><h1>{this.state.data.title}</h1></b>
+            <div style={{padding:"0"}}>{this.state.data.artists[0].name}</div>
+            </div></div></div>
+            <div className='container'><div className='row'>
+                <div className='container'><div className='row'>
+                    {tracklist}
+                </div></div>
+            </div></div></>)
+    }
+
     updateAlbumsJSX = () =>{
         switch (this.state.mode) {
             case modes.MultipleAlbums:
-                return this.multipleAlbumsJSX()
+                return this.multipleAlbumsJSX();
 
             case modes.SingleAlbum:
                 this.setState({albumsJSX:[]})
-                return (<div>Hola mundo</div>)
+                return this.singleAlbumJSX();
 
             default:
                 return (<div></div>)
@@ -133,7 +179,13 @@ class DiscorgsContent extends React.Component{
             <div className='container'>
             <div className='row'>
                 <div className='col-10 offset-1'>
-                    <div><input value={this.state.inputText} className='form-control' type="text" placeholder='Search...' onChange={this.handleSearch} style={{margin:"3% 0% 3% 0%"}}/></div>
+                    <div className='container'><div className='row' style={{margin:"3% 0% 3% 0%"}}>
+                        <div className="col-10"><input value={this.state.inputText} className='form-control' type="text" placeholder='Search...' onChange={this.handleSearch}/></div>
+                        <div className="col-2 form-check form-switch align-items-center">
+                            <input name="filter" className="form-check-input" type="checkbox" role="switch" id="filter" onChange={(event)=>{this.handleOnChangeFilter(event)}}/>
+                            <label id='filter' className="form-check-label" htmlFor="filter">by album</label>
+                        </div>
+                    </div></div>
                     <div id="album-container" className={"container " + this.state.isLoaded?" opacity-100":"opacity-50"}>
                         <div id="album-row" className='row'>
                             {this.state.albumsJSX}

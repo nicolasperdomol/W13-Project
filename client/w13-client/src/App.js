@@ -10,7 +10,7 @@ function App() {
                     <Navbar/>
                     <div className='col'>My playlist</div>
                 </div>
-                <div className="col" style={{backgroundColor:"#1c1c1c"}}>
+                <div className="col" style={{backgroundColor:"#1c1c1c", minHeight:"100vh"}}>
                     <MainContent/>
                 </div>
             </div>
