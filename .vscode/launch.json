@@ -11,7 +11,7 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
-            "program": "${workspaceFolder}\\server\\src\\queries.js"
+            "program": "${workspaceFolder}\\server\\src\\server.js"
         }
     ]
 }

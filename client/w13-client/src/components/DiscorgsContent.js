@@ -110,8 +110,58 @@ class DiscorgsContent extends React.Component{
         this.setState({filter:event.target.value})
     }
 
-    handleOnClickAddAlbum = (event) =>{
-        console.log(event.currentTarget.children.item(0))
+    handleOnClickAddAlbum = async(event) =>{
+        var he = require("he")
+        let children = event.currentTarget.children;
+        let playlist = {
+            "id": children[0].value,
+            "title": children[1].value.toLowerCase(),
+            "genres": children[2].value.toLowerCase(),
+            "year": children[3].value,
+            "uri": he.decode(children[4].value).toLowerCase()
+        }
+
+        let tracklist = [];
+        let artists = "";
+        let url = "https://api.discogs.com/masters/" + playlist.id;
+
+        //Fetch and get artist and tracklist of selected album.
+        try{
+            let response = await fetch(url);
+            let json = await response.json();
+            let isArtistAvailable = json.artists !== undefined;
+            let isTracklistAvailable = json.tracklist !== undefined;
+            
+            if(isArtistAvailable){
+                artists = json.artists;
+            }
+            if(isTracklistAvailable){
+                json.tracklist.forEach((track)=>{
+                    tracklist.push(track);
+                })
+            }
+    
+            playlist["artists"] = artists;
+            playlist["tracklist"] = tracklist;
+            
+            console.log([playlist])
+            let jsonBody = JSON.stringify([playlist])
+
+            url = "http://localhost:8000/playlist"
+            response = await fetch(url, {
+                method : 'POST',
+                mode : 'cors',
+                headers:{
+                    'Content-type':'application/json'
+                },
+                body: jsonBody
+            });
+            json = await response.json()
+            console.log(json);
+
+        }catch(e){
+            console.error(e)
+        }
     }
 
     multipleAlbumsJSX = () =>{
@@ -122,7 +172,6 @@ class DiscorgsContent extends React.Component{
             albumJSXArray.push(<b key="Bold Exploring"><h3 key="Exploring" style={{marginTop:"2%"}}>Exploring {this.state.inputText}</h3></b>)
             for (let i = 0; i < this.state.data.results.length; i++) {
                 const result = this.state.data.results[i];
-
                 if(uniqueMaster[result.master_id] === undefined){
                     //{Unique master : Has been display(false)}
                     uniqueMaster[result.master_id] = false;
@@ -135,7 +184,14 @@ class DiscorgsContent extends React.Component{
                             <input id="masterId" type="hidden" value={result.master_id}/>
                             <div className='row'>
                                 <img style={{maxWidth:"171px", maxHeight:"171px"}} src={result.thumb} alt={result.title} onError={(event)=>{event.target.src = "https://user-images.githubusercontent.com/101482/29592647-40da86ca-875a-11e7-8bc3-941700b0a323.png"}}/>
-                                <button id="addAlbum" className='btn btn-success' style={{borderRadius:"100%", width:"40px", height:"40px", position:"absolute"}} onClick={(event)=>{event.stopPropagation(); this.handleOnClickAddAlbum(event)}}>+<input type="hidden" name='master_id' value={result.master_id} /></button>
+                                <button id="addAlbum" className='btn btn-success' style={{borderRadius:"100%", width:"40px", height:"40px", position:"absolute"}} onClick={(event)=>{event.stopPropagation(); this.handleOnClickAddAlbum(event)}}>+<input type="hidden" name='master_id' value={result.master_id} />
+                                
+                                <input type={"hidden"} name="title" value={result.title}/>
+                                <input type={"hidden"} name="genres" value={result.genre}/>
+                                <input type={"hidden"} name="year" value={result.year}/>
+                                <input type={"hidden"} name="uri" value={result.uri}/>
+
+                                </button>
                             </div>
                             <div className='row text-justify' style={{marginTop:'10%'}}><b>{result.title}</b></div>
                         </div></div>

@@ -53,8 +53,9 @@ const saveRelease = (request, response) => {
     //Validating whether release exists in DB
     db.queryParams('SELECT * FROM public.playlists WHERE id = $1', [id], (result) => {
         if (result.rowCount == 1) {
-            response.writeHead(404, { 'Content-Type': 'text/html' });
-            response.end('Release is already in playlist.');
+            response.writeHead(404, { 'Content-Type': 'application/json' });
+            let message = JSON.stringify({"message":'Release is already in playlist.'})
+            response.end(message);
         } else {
             //Always retrieving one object (album or song) at a time
             let JSONObject = data[0];
