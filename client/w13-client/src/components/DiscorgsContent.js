@@ -157,7 +157,6 @@ class DiscorgsContent extends React.Component{
                 body: jsonBody
             });
             json = await response.json()
-            console.log(json);
 
         }catch(e){
             console.error(e)
