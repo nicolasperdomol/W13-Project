@@ -31,7 +31,7 @@ function query(sqlStatement, resultCallback) {
         if (error) {
             console.log(error.message);
         } else {
-            resultCallback(result.rows); //Returning data
+            resultCallback(result);
         }
     });
 
@@ -43,7 +43,7 @@ function queryParams(sqlStatement, params, resultCallback) {
         if (error) {
             console.log(error.message);
         } else {
-            resultCallback(result.rows); //Returning data
+            resultCallback(result);
         }
     })
 }

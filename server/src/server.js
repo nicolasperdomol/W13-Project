@@ -15,15 +15,16 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 app.use(cors());
 
-// Get all albums
+// Get all releases
 app.get('/playlist', query.getPlaylist);
 
-// Get single album by ID
-app.get('/playlist/:id', query.getAlbum);
+// Get releases (album or song) by ID
+app.get('/playlist/:id', query.getRelease);
 
-//Saving album in DB
-app.post('/playlist', query.saveAlbum);
+//Saving release (album or song) in DB
+app.post('/playlist', query.saveRelease);
 
+//Deleting release (album or song) in DB
 app.delete('/playlist/:id', query.removeAlbum);
 
 app.listen(portNumber, function() {
