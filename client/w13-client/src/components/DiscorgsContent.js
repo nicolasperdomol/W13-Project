@@ -131,14 +131,14 @@ class DiscorgsContent extends React.Component{
                 //Filtered by UNIQUE MASTER_ID
                 if(uniqueMaster[result.master_id] === false){
                     albumJSXArray.push(<div style={{margin:"5% 0 5% 0"}}  key={result.id} className='col-3' onMouseOver={(event)=>{this.handleOnMouseOverAlbum(event)}} onMouseOut={(event)=>{this.handleOnMouseOutAlbum(event)}}>
-                        <button key={"albumsContainer"} style={{border:"none", backgroundColor:"transparent", color:"white"}} onClick={(event)=>{this.handleOnClickAlbum(event)}}><div className='container'>
+                        <div role={"button"} key={"albumsContainer"} style={{border:"none", backgroundColor:"transparent", color:"white"}} onClick={(event)=>{this.handleOnClickAlbum(event)}}><div className='container'>
                             <input id="masterId" type="hidden" value={result.master_id}/>
                             <div className='row'>
                                 <img style={{maxWidth:"171px", maxHeight:"171px"}} src={result.thumb} alt={result.title} onError={(event)=>{event.target.src = "https://user-images.githubusercontent.com/101482/29592647-40da86ca-875a-11e7-8bc3-941700b0a323.png"}}/>
                                 <button id="addAlbum" className='btn btn-success' style={{borderRadius:"100%", width:"40px", height:"40px", position:"absolute"}} onClick={(event)=>{event.stopPropagation(); this.handleOnClickAddAlbum(event)}}>+<input type="hidden" name='master_id' value={result.master_id} /></button>
                             </div>
                             <div className='row text-justify' style={{marginTop:'10%'}}><b>{result.title}</b></div>
-                        </div></button>
+                        </div></div>
                     </div>)
 
                     //Unique master was display
@@ -154,8 +154,12 @@ class DiscorgsContent extends React.Component{
     singleAlbumJSX = () =>{
         let tracklist = []
         let index = 1;
-        this.state.data.tracklist?.forEach(track => {
-            tracklist.push(<div className='container' style={{marginTop:"0.5%"}} key={track.title}><div className='row'><div className='col-1'>{index}</div><div className='col'><b>{track.title}</b></div><div className='col-1 align-self-end'>{track.duration}</div></div></div>)
+        if(this.state.data.message !== undefined){
+            return (<h3>{this.state.data.message}</h3>)
+        }
+
+        this.state.data.tracklist.forEach(track => {
+            tracklist.push(<div className='container' style={{marginTop:"0.5%"}} key={track.title+index}><div className='row'><div className='col-1'>{index}</div><div className='col'><b>{track.title}</b></div><div className='col-1 align-self-end'>{track.duration}</div></div></div>)
             index++;
         });
 
