@@ -75,8 +75,9 @@ const saveRelease = (request, response) => {
             db.queryParams('INSERT INTO public.playlists(id, title, artists, genres, year, tracklist, uri)' + 
                            ' VALUES ($1, $2, $3, $4, $5, $6, $7)' + 'RETURNING *', params, (result) => {
                 
-            response.writeHead(200, { 'Content-Type': 'text/html' });
-            response.end(JSONObject.title + ' was added in playlist!');
+            response.writeHead(200, { 'Content-Type': 'application/json' });
+            let message = JSON.stringify({"message":JSONObject.title + ' was added in playlist!'})
+            response.end(message);
             });
         }
     });

@@ -12,6 +12,7 @@ class DiscorgsContent extends React.Component{
      * @property {JSX} albumsJSX Main source of what we will display to the user, depends on [data] and [mode].
      * @property {enum} mode Affects albumsJSX in the way we will display the information [MultipleAlbums: in a grid with 4 columns / SingleAlbum: col-12 full width of the page]
      * @property {string} additionalMedia Images and other relevant data that are not found in the new data.
+     * @property {object} message Alert message for the user, ['ok'] Success state or not, ['message'] String message.
      */
     constructor(props){
         super(props);
@@ -22,7 +23,9 @@ class DiscorgsContent extends React.Component{
             albumsJSX:(<div className='col' style={{padding:"10%"}}><h1 className='text-center'>What do you want to listen to?</h1><img src={jazzBandIMG} alt="jazz band" /></div>),
             mode:modes.MultipleAlbums,
             filter:"artist",
-            additionalMedia:[]
+            additionalMedia:[],
+            statusMessage:{},
+            messageJSX:(<div></div>)
         }
     }
 
@@ -100,7 +103,6 @@ class DiscorgsContent extends React.Component{
                 mode:modes.SingleAlbum,
                 additionalMedia: {image:thumbSource}
             })
-
         } catch (e) {
             console.error(e);
         }
@@ -116,7 +118,7 @@ class DiscorgsContent extends React.Component{
         let playlist = {
             "id": children[0].value,
             "title": children[1].value.toLowerCase(),
-            "genres": children[2].value.toLowerCase(),
+            "genres": [children[2].value.toLowerCase()],
             "year": children[3].value,
             "uri": he.decode(children[4].value).toLowerCase()
         }
@@ -144,10 +146,9 @@ class DiscorgsContent extends React.Component{
             playlist["artists"] = artists;
             playlist["tracklist"] = tracklist;
             
-            console.log([playlist])
             let jsonBody = JSON.stringify([playlist])
 
-            url = "http://localhost:8000/playlist"
+            url = "http://localhost:8000/playlists"
             response = await fetch(url, {
                 method : 'POST',
                 mode : 'cors',
@@ -156,8 +157,16 @@ class DiscorgsContent extends React.Component{
                 },
                 body: jsonBody
             });
-            json = await response.json()
 
+            let ok = response.status === 200;
+            json = await response.json()
+            this.setState({statusMessage:{
+                ok: ok,
+                ...json
+            }}, ()=>{this.setState({messageJSX: this.getMessageJSX()});})
+           
+            
+            
         }catch(e){
             console.error(e)
         }
@@ -218,10 +227,15 @@ class DiscorgsContent extends React.Component{
             index++;
         });
 
+        let artistName = ''
+        if(this.state.data.artists !== undefined && this.state.data.artists[0] !== undefined && this.state.data.artists[0].name!==undefined){
+            artistName = this.state.data.artists[0].name;
+        }
+
         return (<><div className='col-3'><img src={this.state.additionalMedia.image} alt="Album cover" /></div>
         <div className='col-9' style={{marginBottom:"9%"}}><div className='container'><div className='row'>album</div><div className='row'>
             <b style={{padding:"0"}}><h1>{this.state.data.title}</h1></b>
-            <div style={{padding:"0"}}>{this.state.data.artists[0] !== undefined ? this.state.data.artists[0].name : ""}</div>
+            <div style={{padding:"0"}}>{artistName}</div>
             </div></div></div>
             <div className='container'><div className='row'>
                 <div className='container'><div className='row'>
@@ -242,7 +256,19 @@ class DiscorgsContent extends React.Component{
             default:
                 return (<div></div>)
         }
-        
+    }
+
+    getMessageJSX = () => {
+        let row = (<div></div>)
+        if(this.state.statusMessage.ok !== undefined){
+            //Error message
+            row = (<div className='alert alert-danger' role='alert' style={{marginTop:"3%"}}>{this.state.statusMessage.message}</div>)
+            if(this.state.statusMessage.ok){
+                //Success message
+                row = (<div className='alert alert-success' role='alert'>{this.state.statusMessage.message}</div>)
+            }
+        }
+        return row;
     }
     
     render(){
@@ -251,6 +277,7 @@ class DiscorgsContent extends React.Component{
             <div className='row'>
                 <div className='col-10 offset-1'>
                     <div className='container'>
+                        {this.state.messageJSX}
                         <div className="row" style={{marginTop:"2%"}}><input value={this.state.inputText} className='form-control' type="text" placeholder='Search...' onChange={this.handleSearch}/></div>
                         <div className='row' style={{margin:"3% 0% 3% 0%"}}>
                         <div className='col-1'>Filters: </div>

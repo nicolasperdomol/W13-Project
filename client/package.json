@@ -12,6 +12,5 @@
   "devDependencies": {
     "eslint": "^8.23.0",
     "react": "^18.2.0"
-  },
-  "proxy":"https://api.discogs.com/"
+  }
 }
