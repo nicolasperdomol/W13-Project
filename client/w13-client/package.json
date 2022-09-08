@@ -40,6 +40,5 @@
     "fetch-node": "^0.0.1",
     "he": "^1.2.0",
     "jsdoc": "^3.6.11"
-  },
-  "proxy": "https://api.discogs.com/"
+  }
 }

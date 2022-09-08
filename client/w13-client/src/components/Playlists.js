@@ -8,6 +8,7 @@ class Playlist extends React.Component {
         this.state = {
             release_data: [],
             isLoading: true,
+
         };
     }
 

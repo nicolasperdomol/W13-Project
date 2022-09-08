@@ -118,7 +118,7 @@ class DiscorgsContent extends React.Component{
         let playlist = {
             "id": children[0].value,
             "title": children[1].value.toLowerCase(),
-            "genres": children[2].value.toLowerCase(),
+            "genres": [children[2].value.toLowerCase()],
             "year": children[3].value,
             "uri": he.decode(children[4].value).toLowerCase()
         }
@@ -148,7 +148,7 @@ class DiscorgsContent extends React.Component{
             
             let jsonBody = JSON.stringify([playlist])
 
-            url = "http://localhost:8000/playlist"
+            url = "http://localhost:8000/playlists"
             response = await fetch(url, {
                 method : 'POST',
                 mode : 'cors',
@@ -163,7 +163,7 @@ class DiscorgsContent extends React.Component{
             this.setState({statusMessage:{
                 ok: ok,
                 ...json
-            }}, ()=>{this.setState({messageJSX: this.getMessageJSX()}) })
+            }}, ()=>{this.setState({messageJSX: this.getMessageJSX()});})
            
             
             
