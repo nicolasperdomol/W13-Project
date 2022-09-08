@@ -2,6 +2,7 @@
 import React from 'react'
 import styles from './css/DiscorgsContent.module.css'
 import jazzBandIMG from '../imgs/jazzBand.svg'
+
 import {DiscorgsContentModes as modes} from './componentEnums'
 class DiscorgsContent extends React.Component{
     /**
@@ -20,7 +21,7 @@ class DiscorgsContent extends React.Component{
             inputText:"",
             isLoaded:true,
             data:[],
-            albumsJSX:(<div className='col' style={{padding:"10%"}}><h1 className='text-center'>What do you want to listen to?</h1><img src={jazzBandIMG} alt="jazz band" /></div>),
+            albumsJSX:(<div className='col' id={styles.listenTo}><h1 className='text-center'>What do you want to listen to?</h1><img src={jazzBandIMG} alt="jazz band" /></div>),
             mode:modes.MultipleAlbums,
             filter:"artist",
             additionalMedia:[],
@@ -177,7 +178,7 @@ class DiscorgsContent extends React.Component{
             this.setState({albumsJSX:[]})
             let albumJSXArray = []
             const uniqueMaster = {};
-            albumJSXArray.push(<b key="Bold Exploring"><h3 key="Exploring" style={{marginTop:"2%"}}>Exploring {this.state.inputText}</h3></b>)
+            albumJSXArray.push(<b key="Bold Exploring"><h3 key="Exploring" id={styles.exploring}>Exploring {this.state.inputText}</h3></b>)
             for (let i = 0; i < this.state.data.results.length; i++) {
                 const result = this.state.data.results[i];
                 if(uniqueMaster[result.master_id] === undefined){
@@ -187,12 +188,12 @@ class DiscorgsContent extends React.Component{
                 
                 //Filtered by UNIQUE MASTER_ID
                 if(uniqueMaster[result.master_id] === false){
-                    albumJSXArray.push(<div style={{margin:"5% 0 5% 0"}}  key={result.id} className='col-3' onMouseOver={(event)=>{this.handleOnMouseOverAlbum(event)}} onMouseOut={(event)=>{this.handleOnMouseOutAlbum(event)}}>
-                        <div role={"button"} key={"albumsContainer"} style={{border:"none", backgroundColor:"transparent", color:"white"}} onClick={(event)=>{this.handleOnClickAlbum(event)}}><div className='container'>
+                    albumJSXArray.push(<div key={result.id} className={'col-3 ' + styles.albumCard} onMouseOver={(event)=>{this.handleOnMouseOverAlbum(event)}} onMouseOut={(event)=>{this.handleOnMouseOutAlbum(event)}}>
+                        <div role={"button"} key={"albumsContainer"} onClick={(event)=>{this.handleOnClickAlbum(event)}}><div className='container'>
                             <input id="masterId" type="hidden" value={result.master_id}/>
                             <div className='row'>
-                                <img style={{maxWidth:"171px", maxHeight:"171px"}} src={result.thumb} alt={result.title} onError={(event)=>{event.target.src = "https://user-images.githubusercontent.com/101482/29592647-40da86ca-875a-11e7-8bc3-941700b0a323.png"}}/>
-                                <button id="addAlbum" className='btn btn-success' style={{borderRadius:"100%", width:"40px", height:"40px", position:"absolute"}} onClick={(event)=>{event.stopPropagation(); this.handleOnClickAddAlbum(event)}}>+<input type="hidden" name='master_id' value={result.master_id} />
+                                <img className={styles.albumCardImage} src={result.thumb} alt={result.title} onError={(event)=>{event.target.src = "https://user-images.githubusercontent.com/101482/29592647-40da86ca-875a-11e7-8bc3-941700b0a323.png"}}/>
+                                <button className={'btn btn-success ' + styles.addAlbumButton} onClick={(event)=>{event.stopPropagation(); this.handleOnClickAddAlbum(event)}}>+<input type="hidden" name='master_id' value={result.master_id} />
                                 
                                 <input type={"hidden"} name="title" value={result.title}/>
                                 <input type={"hidden"} name="genres" value={result.genre}/>
@@ -201,7 +202,7 @@ class DiscorgsContent extends React.Component{
 
                                 </button>
                             </div>
-                            <div className='row text-justify' style={{marginTop:'10%'}}><b>{result.title}</b></div>
+                            <div className={'row text-justify ' + styles.resultTitle}><b>{result.title}</b></div>
                         </div></div>
                     </div>)
 
@@ -223,7 +224,7 @@ class DiscorgsContent extends React.Component{
         }
 
         this.state.data.tracklist.forEach(track => {
-            tracklist.push(<div className='container' style={{marginTop:"0.5%"}} key={track.title+index}><div className='row'><div className='col-1'>{index}</div><div className='col'><b>{track.title}</b></div><div className='col-1 align-self-end'>{track.duration}</div></div></div>)
+            tracklist.push(<div className='container' id={styles.singleAlbumContainer} key={track.title+index}><div className='row'><div className='col-1'>{index}</div><div className='col'><b>{track.title}</b></div><div className='col-1 align-self-end'>{track.duration}</div></div></div>)
             index++;
         });
 
@@ -233,9 +234,9 @@ class DiscorgsContent extends React.Component{
         }
 
         return (<><div className='col-3'><img src={this.state.additionalMedia.image} alt="Album cover" /></div>
-        <div className='col-9' style={{marginBottom:"9%"}}><div className='container'><div className='row'>album</div><div className='row'>
-            <b style={{padding:"0"}}><h1>{this.state.data.title}</h1></b>
-            <div style={{padding:"0"}}>{artistName}</div>
+        <div className={'col-9 ' + styles.singleAlbumParentContainer}><div className='container'><div className='row'>album</div><div className='row'>
+            <b className={styles.singleAlbumTitle}><h1>{this.state.data.title}</h1></b>
+            <div className={styles.singleAlbumTitle}>{artistName}</div>
             </div></div></div>
             <div className='container'><div className='row'>
                 <div className='container'><div className='row'>
@@ -262,10 +263,10 @@ class DiscorgsContent extends React.Component{
         let row = (<div></div>)
         if(this.state.statusMessage.ok !== undefined){
             //Error message
-            row = (<div className='alert alert-danger' role='alert' style={{marginTop:"3%"}}>{this.state.statusMessage.message}</div>)
+            row = (<div className={'alert alert-danger ' + styles.message} role='alert'>{this.state.statusMessage.message}</div>)
             if(this.state.statusMessage.ok){
                 //Success message
-                row = (<div className='alert alert-success' role='alert'>{this.state.statusMessage.message}</div>)
+                row = (<div className={'alert alert-success ' + styles.message} role='alert'>{this.state.statusMessage.message}</div>)
             }
         }
         return row;
@@ -278,8 +279,8 @@ class DiscorgsContent extends React.Component{
                 <div className='col-10 offset-1'>
                     <div className='container'>
                         {this.state.messageJSX}
-                        <div className="row" style={{marginTop:"2%"}}><input value={this.state.inputText} className='form-control' type="text" placeholder='Search...' onChange={this.handleSearch}/></div>
-                        <div className='row' style={{margin:"3% 0% 3% 0%"}}>
+                        <div className={"row "} id={styles.searchBar}><input value={this.state.inputText} className='form-control' type="text" placeholder='Search...' onChange={this.handleSearch}/></div>
+                        <div className={'row'} id={styles.filtersRow}>
                         <div className='col-1'>Filters: </div>
                         <div className="col form-check form-switch">
                             <div className='container'><div className='row'>
