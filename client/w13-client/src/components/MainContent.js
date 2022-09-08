@@ -6,7 +6,7 @@ class MainContent extends React.Component{
         return(<div className={styles.MainContent}>
             <div className='container'>
                 <div className='row'>
-                    <div className='col'><DiscorgsContent/></div>
+                    <div className={'col DiscorgsContent'}><DiscorgsContent/></div>
                 </div>
             </div>
             </div>)
