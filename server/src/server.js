@@ -16,16 +16,16 @@ app.use(express.json());
 app.use(cors());
 
 // Get all releases
-app.get('/playlist', query.getPlaylist);
+app.get('/playlists', query.getPlaylist);
 
 // Get releases (album or song) by ID
-app.get('/playlist/:id', query.getRelease);
+app.get('/playlists/:id', query.getRelease);
 
 //Saving release (album or song) in DB
-app.post('/playlist', query.saveRelease);
+app.post('/playlists', query.saveRelease);
 
 //Deleting release (album or song) in DB
-app.delete('/playlist/:id', query.removeAlbum);
+app.delete('/playlists/:id', query.removeAlbum);
 
 app.listen(portNumber, function() {
     console.log('Server listening to port', portNumber);
