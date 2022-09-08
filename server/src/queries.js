@@ -1,7 +1,7 @@
 const db = require('./db');
 
-/** Retrieves all albums */
-const getPlaylist = (request, response) => {
+/** Retrieves all playlists */
+const getPlaylists = (request, response) => {
     
     //Connecting to DB
     db.connect();
@@ -15,16 +15,16 @@ const getPlaylist = (request, response) => {
     // db.disconnect(); //TO DO
 } 
 
-/** Retrieves release (album or song) by ID */
-const getRelease = (request, response) => {
+/** Retrieves all releases (albums or songs) in playlist */
+const getReleases = (request, response) => {
     
     //Connecting to DB
     db.connect();
     
     //Retrieving parameters
     let params = [request.params.id];
-    db.queryParams('SELECT id, title, artists, genres, year, tracklist, uri' +
-                   ' FROM public.playlists WHERE id = $1', params, (result) => {    
+    db.queryParams('SELECT playlist_id, release_id, title, artists, genres, year, tracklist, uri' +
+                   ' FROM public.albums WHERE playlist_id = $1', params, (result) => {    
 
     if(result.rowCount == 1) {
         let JSONObject = result.rows;
@@ -40,7 +40,36 @@ const getRelease = (request, response) => {
     // db.disconnect(); //TO DO
 }
 
-/** Adds album to DB */
+/** Adds playlist in DB */
+const savePlaylist = (request, response) => {
+    
+    //Connecting to DB
+    db.connect();
+    
+    //Retrieving data
+    let data = request.body;
+    let id = data[0].id
+
+    //Validating whether playlist exists in DB
+    db.queryParams('SELECT * FROM public.playlists WHERE id = $1', [id], (result) => {
+        if (result.rowCount == 1) {
+            response.writeHead(404, { 'Content-Type': 'application/json' });
+            let message = JSON.stringify({"message":'Playlist already exists.'})
+            response.end(message);
+        } else {
+            let playlist_name = data[0].name;
+            db.queryParams('INSERT INTO public.playlists(name) VALUES ($1) ' 
+                            + 'RETURNING *', [playlist_name], (result) => {
+                
+            response.writeHead(200, { 'Content-Type': 'application/json' });
+            let message = JSON.stringify({"message": 'Playlist ' + data[0].name + ' was created!'})
+            response.end(message);
+            });
+        }
+    });
+}
+
+/** Adds album in DB */
 const saveRelease = (request, response) => {
     
     //Connecting to DB
@@ -51,7 +80,7 @@ const saveRelease = (request, response) => {
     let id = data[0].id;
 
     //Validating whether release exists in DB
-    db.queryParams('SELECT * FROM public.playlists WHERE id = $1', [id], (result) => {
+    db.queryParams('SELECT * FROM public.albums WHERE playlist_id = $1', [id], (result) => {
         if (result.rowCount == 1) {
             response.writeHead(404, { 'Content-Type': 'application/json' });
             let message = JSON.stringify({"message":'Release is already in playlist.'})
@@ -69,11 +98,11 @@ const saveRelease = (request, response) => {
             // let JSONObjectString = JSON.parse
         
             //Storing only the first values if category is an array (Ex. artists);
-            let params = [JSONObject.id, JSONObject.title, JSONObject.artists[0].name, JSONObject.genres[0], 
-                          JSONObject.year, tracklist, JSONObject.uri];
+            let params = [JSONObject.playlist_id, JSONObject.id, JSONObject.title, JSONObject.artists[0].name, JSONObject.genres[0], 
+                          JSONObject.year, tracklist, JSONObject.uri, JSONObject.thumb];
             
-            db.queryParams('INSERT INTO public.playlists(id, title, artists, genres, year, tracklist, uri)' + 
-                           ' VALUES ($1, $2, $3, $4, $5, $6, $7)' + 'RETURNING *', params, (result) => {
+            db.queryParams('INSERT INTO public.albums(playlist_id, release_id, title, artists, genres, year, tracklist, uri, image_url)' + 
+                           ' VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)' + 'RETURNING *', params, (result) => {
                 
             response.writeHead(200, { 'Content-Type': 'application/json' });
             let message = JSON.stringify({"message":JSONObject.title + ' was added in playlist!'})
@@ -88,15 +117,13 @@ const removeAlbum = (request, response) => {
     
     //Connecting to DB
     db.connect();
-    
-    //Retrieving parameters
-    let params = [request.params.id];
 
     //Validating whether release exists in DB
-    db.queryParams('SELECT * FROM public.playlists WHERE id = $1', params, (result) => { 
+    db.queryParams('SELECT * FROM public.albums WHERE release_id = $1', [request.params.album], (result) => { 
 
         if(result.rowCount == 1) {
-            db.queryParams('DELETE FROM public.playlists WHERE id = $1', params, (result) => {    
+            let params = [request.params.playlist, request.params.album];
+            db.queryParams('DELETE FROM public.albums WHERE playlist_id = $1 AND release_id = $2', params, (result) => {    
                 response.writeHead(200, { 'Content-Type': 'text/html'});
                 response.end('Release was deleted.');
             });   
@@ -108,9 +135,37 @@ const removeAlbum = (request, response) => {
     });
 }
 
+/** Removes playlist from DB */
+const removePlaylist = (request, response) => {
+    
+    //Connecting to DB
+    db.connect();
+    
+    //Retrieving parameters
+    let params = [request.params.playlist];
+    
+    //Deleting content of playlist
+    db.queryParams('DELETE FROM public.albums WHERE playlist_id = $1', params, (result) => {
+        
+        //Deleting playlist
+        if(result.rowCount == 0) {
+            db.queryParams('DELETE FROM public.playlists WHERE id = $1', params, (result) => {    
+                response.writeHead(200, { 'Content-Type': 'text/html'});
+                response.end('Playlist was deleted.');
+            });   
+
+        } else {
+            response.writeHead(402, { 'Content-Type': 'text/html'});
+            response.end('Playlist does not exist.');
+        }
+    });
+}
+
 module.exports = {
-    getPlaylist,
-    getRelease,
+    getPlaylists,
+    getReleases,
+    savePlaylist,
     saveRelease,
-    removeAlbum
+    removeAlbum,
+    removePlaylist
 }
