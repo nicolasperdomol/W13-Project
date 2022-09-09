@@ -187,7 +187,6 @@ class DiscorgsContent extends React.Component{
         let album = {};
         album['playlist_id'] = parseInt(event.currentTarget.children.item(1).value);
         let releaseId = parseInt(event.currentTarget.children.item(0).value);
-        console.log(event.currentTarget.children)
         album['id'] = releaseId;
         let selectedAlbum = undefined
         this.state.data.results.map((result)=>{
