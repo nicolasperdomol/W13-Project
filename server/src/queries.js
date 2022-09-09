@@ -46,7 +46,11 @@ const savePlaylist = (request, response) => {
     
     //Retrieving data
     let data = request.body;
-    let id = data[0].id
+    let id = 0;
+
+    if(data[0].id !== undefined){
+        id = data[0].id
+    }
 
     //Validating whether playlist exists in DB
     // db.queryParams('SELECT * FROM public.playlists WHERE id = $1', [id], (result) => {
@@ -90,9 +94,11 @@ const saveRelease = (request, response) => {
             //Retrieving tracklist titles only
             let tracklist_data = data[0].tracklist;
             let tracklist = [];
-            for(let i = 0; i < tracklist_data.length; i++){
-                tracklist.push(tracklist_data[i].title);
-            };
+            if(tracklist_data !== undefined){
+                for(let i = 0; i < tracklist_data.length; i++){
+                    tracklist.push(tracklist_data[i].title);
+                };
+            }
         
             //Storing only the first values if category is an array (Ex. artists);
             let params = [JSONObject.playlist_id, JSONObject.id, JSONObject.title, JSONObject.artists[0].name, JSONObject.genres[0], 
@@ -102,7 +108,7 @@ const saveRelease = (request, response) => {
                            ' VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)' + 'RETURNING *', params, (result) => {
                 
             response.writeHead(200, { 'Content-Type': 'application/json' });
-            let message = JSON.stringify({"message":JSONObject.title + ' was added in playlist!'})
+            let message = JSON.stringify({message:JSONObject.title + ' was added in playlist!'})
             response.end(message);
             });
         }
@@ -147,13 +153,15 @@ const removePlaylist = (request, response) => {
         //Deleting playlist
         if(result.rowCount == 0) {
             db.queryParams('DELETE FROM public.playlists WHERE id = $1', params, (result) => {    
-                response.writeHead(200, { 'Content-Type': 'text/html'});
-                response.end('Playlist was deleted.');
+                response.writeHead(200, { 'Content-Type': 'application/json'});
+                let message = JSON.stringify({message:'Playlist was deleted.'})
+                response.end(message);
             });   
 
         } else {
-            response.writeHead(402, { 'Content-Type': 'text/html'});
-            response.end('Playlist does not exist.');
+            response.writeHead(404, { 'Content-Type': 'application/json'});
+            let message = JSON.stringify({message:'Playlist does not exist.'})
+            response.end(message);
         }
     });
 }
