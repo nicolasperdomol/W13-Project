@@ -67,7 +67,7 @@ const savePlaylist = (request, response) => {
             let message = JSON.stringify({"message": 'Playlist ' + data[0].name + ' was created!'})
             response.end(message);
             });
-        // }
+        // } 
     // });
 }
 
