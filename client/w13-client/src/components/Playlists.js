@@ -26,7 +26,7 @@ class Playlist extends React.Component {
 
         let table_data = data.map((item) => {
             return (
-                <tbody key='tableData'><tr key={item.id}>
+                <tbody key='tableData'><tr key={item.release_id}>
                     <td><div><b>{item.title} - {item.artists}</b></div>
                     <div><b>ID #</b>{item.id}</div>
                     <div><b>Genre: </b>{item.genres}</div>
@@ -38,7 +38,6 @@ class Playlist extends React.Component {
                         })}</div>
                     </ol>
                     <div><b>URI:</b> {item.uri}</div>
-                    <button type="button">Remove</button>
                 </td></tr></tbody>
             )
         })
