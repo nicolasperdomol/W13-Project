@@ -6,7 +6,7 @@ class Playlist extends React.Component {
 
         //Setting initial state
         this.state = {
-            release_data: [],
+            playlists: [],
             isLoading: true,
             dataJSX:[]
         };
@@ -16,32 +16,28 @@ class Playlist extends React.Component {
         const url = 'http://localhost:8000/playlists';
         const response = await fetch(url);
         const data = await response.json();
-        this.setState({release_data: data, isLoading: false
-        }, ()=>{this.setState({dataJSX:this.setDataJSX()})});
+        this.setState({playlists: data, isLoading: false
+        }, ()=>{this.setState({dataJSX: this.setDataJSX()})});
     }
 
     setDataJSX = () => {
         //Setting data
-        const data = this.state.release_data;
-
-        let table_data = data.map((item) => {
-            return (
-                <tbody key='tableData'><tr key={item.release_id}>
-                    <td><div><b>{item.title} - {item.artists}</b></div>
-                    <div><b>ID #</b>{item.id}</div>
-                    <div><b>Genre: </b>{item.genres}</div>
-                    <div><b>Year: </b>{item.year}</div>
-                    <div><b>Tracklist</b></div>
-                    <ol>
-                        <div>{item.tracklist.map((item, index) => {
-                            return <li key={index}>{item}</li>
-                        })}</div>
-                    </ol>
-                    <div><b>URI:</b> {item.uri}</div>
-                </td></tr></tbody>
-            )
-        })
-        return table_data;
+        const data = this.state.playlists;
+        return (
+            data.map((item, index) => {
+                return <li key={index}>{item.name}</li>
+            })
+        );
+        // let list = () => {
+        //     return (
+        //             <ol>
+        //                 <div>{data.map((item, index) => {
+        //                     return <li key={index}>{item.name}</li>
+        //                 })}</div>
+        //             </ol>
+        //     )
+        // }
+        // return list;
     }
 
     render() {
@@ -51,16 +47,14 @@ class Playlist extends React.Component {
         }
 
         //Setting message if data is yet to be retrieved
-        if(!this.state.release_data) {
+        if(!this.state.playlists) {
             return<div>Waiting for data...</div>
         }
 
         return (
             <div style={{color:'white'}}>
                 <h1>My Playlist</h1>
-                <table >
-                    {this.state.dataJSX}
-                </table>
+                <ul>{this.state.dataJSX}</ul>
             </div>
         )
 
