@@ -10,8 +10,7 @@ Content-Type: application/json
 
 [
   {
-    "id": 2,
-    "name": "test2"
+    "name": "test9"
   }
 ]
 
@@ -320,7 +319,7 @@ Content-Type: application/json
 ]
 
 ### The DELETE /playlist/:playlist
-DELETE http://localhost:8000/playlists/5 HTTP/1.1
+DELETE http://localhost:8000/playlists/6 HTTP/1.1
 
 ### The DELETE /playlist/:playlist/:album
 DELETE http://localhost:8000/playlists/5/67892 HTTP/1.1

@@ -1,8 +1,12 @@
 import "./App.css"
 import Navbar from "./components/Navbar";
 import MainContent from "./components/MainContent";
-import Playlists from './components/Playlists'
+import Playlists from "./components/Playlists";
+// import io from "socket.io-client";
+// const socket = io.connect("http://localhost:3000");
+
 function App() {
+
   return (
     <div className="App">
         <div className="container">

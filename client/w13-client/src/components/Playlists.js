@@ -13,11 +13,20 @@ class Playlist extends React.Component {
     }
 
     async componentDidMount() {
-        const url = 'http://localhost:8000/playlists';
-        const response = await fetch(url);
-        const data = await response.json();
-        this.setState({playlists: data, isLoading: false
-        }, ()=>{this.setState({dataJSX: this.setDataJSX()})});
+        try {
+            const url = 'http://localhost:8000/playlists';
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            const data = await response.json();
+            this.setState({playlists: data, isLoading: false
+            }, ()=>{this.setState({dataJSX: this.setDataJSX()})});
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     setDataJSX = () => {
@@ -25,19 +34,10 @@ class Playlist extends React.Component {
         const data = this.state.playlists;
         return (
             data.map((item, index) => {
-                return <li key={index}>{item.name}</li>
+                let link = 'http://localhost:8000/playlists/' + item.id;
+                return <li key={index}><a href={link}>{item.name}</a></li>
             })
         );
-        // let list = () => {
-        //     return (
-        //             <ol>
-        //                 <div>{data.map((item, index) => {
-        //                     return <li key={index}>{item.name}</li>
-        //                 })}</div>
-        //             </ol>
-        //     )
-        // }
-        // return list;
     }
 
     render() {
