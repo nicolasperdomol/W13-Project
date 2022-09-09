@@ -13,7 +13,7 @@ class DiscorgsContent extends React.Component{
      * @property {JSX} albumsJSX Main source of what we will display to the user, depends on [data] and [mode].
      * @property {enum} mode Affects albumsJSX in the way we will display the information [MultipleAlbums: in a grid with 4 columns / SingleAlbum: col-12 full width of the page]
      * @property {string} additionalMedia Images and other relevant data that are not found in the new data.
-     * @property {object} message Alert message for the user, ['ok'] Success state or not, ['message'] String message.
+     * @property {object} message Alert message for the user, object{ok: (boolean) Success state or not, message:(string) data}
      */
     constructor(props){
         super(props);
@@ -49,6 +49,9 @@ class DiscorgsContent extends React.Component{
                     data:json,
                     isLoaded:true,
                 }, ()=>{
+
+                    //TODO: Count the amount of request to the API that we do to dont surpass the limit of requests.
+                    
                     //Runs only AFTER this.setState has finished, similar to await this.setState
                     this.setState({albumsJSX:this.updateAlbumsJSX()})
                 });
@@ -113,63 +116,74 @@ class DiscorgsContent extends React.Component{
         this.setState({filter:event.target.value})
     }
 
-    handleOnClickAddAlbum = async(event) =>{
-        var he = require("he")
-        let children = event.currentTarget.children;
-        let playlist = {
-            "id": children[0].value,
-            "title": children[1].value.toLowerCase(),
-            "genres": [children[2].value.toLowerCase()],
-            "year": children[3].value,
-            "uri": he.decode(children[4].value).toLowerCase()
-        }
+    // handleOnClickAddAlbum = async(event) =>{
+    //     var he = require("he")
+    //     let children = event.currentTarget.children;
+    //     let playlist = {
+    //         "id": children[0].value,
+    //         "title": children[1].value.toLowerCase(),
+    //         "genres": [children[2].value.toLowerCase()],
+    //         "year": children[3].value,
+    //         "uri": he.decode(children[4].value).toLowerCase()
+    //     }
 
-        let tracklist = [];
-        let artists = "";
-        let url = "https://api.discogs.com/masters/" + playlist.id;
+    //     let tracklist = [];
+    //     let artists = "";
+    //     let url = "https://api.discogs.com/masters/" + playlist.id;
 
-        //Fetch and get artist and tracklist of selected album.
-        try{
-            let response = await fetch(url);
-            let json = await response.json();
-            let isArtistAvailable = json.artists !== undefined;
-            let isTracklistAvailable = json.tracklist !== undefined;
+    //     //Fetch and get artist and tracklist of selected album.
+    //     try{
+    //         let response = await fetch(url);
+    //         let json = await response.json();
+    //         let isArtistAvailable = json.artists !== undefined;
+    //         let isTracklistAvailable = json.tracklist !== undefined;
             
-            if(isArtistAvailable){
-                artists = json.artists;
-            }
-            if(isTracklistAvailable){
-                json.tracklist.forEach((track)=>{
-                    tracklist.push(track);
-                })
-            }
+    //         if(isArtistAvailable){
+    //             artists = json.artists;
+    //         }
+    //         if(isTracklistAvailable){
+    //             json.tracklist.forEach((track)=>{
+    //                 tracklist.push(track);
+    //             })
+    //         }
     
-            playlist["artists"] = artists;
-            playlist["tracklist"] = tracklist;
+    //         playlist["artists"] = artists;
+    //         playlist["tracklist"] = tracklist;
             
-            let jsonBody = JSON.stringify([playlist])
+    //         let jsonBody = JSON.stringify([playlist])
 
-            url = "http://localhost:8000/playlists"
-            response = await fetch(url, {
-                method : 'POST',
-                mode : 'cors',
-                headers:{
-                    'Content-type':'application/json'
-                },
-                body: jsonBody
-            });
+    //         url = "http://localhost:8000/playlists"
+    //         response = await fetch(url, {
+    //             method : 'POST',
+    //             mode : 'cors',
+    //             headers:{
+    //                 'Content-type':'application/json'
+    //             },
+    //             body: jsonBody
+    //         });
 
-            let ok = response.status === 200;
-            json = await response.json()
-            this.setState({statusMessage:{
-                ok: ok,
-                ...json
-            }}, ()=>{this.setState({messageJSX: this.getMessageJSX()});})
+    //         let ok = response.status === 200;
+    //         json = await response.json()
+    //         this.setState({statusMessage:{
+    //             ok: ok,
+    //             ...json
+    //         }}, ()=>{this.setState({messageJSX: this.getMessageJSX()});})
            
             
             
-        }catch(e){
-            console.error(e)
+    //     }catch(e){
+    //         console.error(e)
+    //     }
+    // }
+
+    handleOnClickAddAlbum = async(event) =>{
+        alert('hola mundo')
+    }
+
+    handleOnClickNewPlaylist = async(event) =>{
+        let playlistName = document.getElementById("playlistName").value.trim();
+        if(playlistName.length > 0){
+            console.log(playlistName)
         }
     }
 
@@ -178,6 +192,13 @@ class DiscorgsContent extends React.Component{
             this.setState({albumsJSX:[]})
             let albumJSXArray = []
             const uniqueMaster = {};
+    
+        
+
+            albumJSXArray.push(<div className='container' key='playlistForm'><div className={'row '}><div className={'col-4 offset-4 '+styles.playlistForm}><div className='container'>
+                <div className='row'>Save to...</div></div>
+                <div style={{margin:0}} className='row'><input type='text' name='playlistName' id='playlistName'/><button onClick={(event)=>{this.handleOnClickNewPlaylist(event)}}>Create new playlist</button></div>
+                </div></div></div>)
             albumJSXArray.push(<b key="Bold Exploring"><h3 key="Exploring" id={styles.exploring}>Exploring {this.state.inputText}</h3></b>)
             for (let i = 0; i < this.state.data.results.length; i++) {
                 const result = this.state.data.results[i];
@@ -216,7 +237,7 @@ class DiscorgsContent extends React.Component{
         }
     }
 
-    singleAlbumJSX = () =>{
+    singleAlbumJSX = async() =>{
         let tracklist = []
         let index = 1;
         if(this.state.data.message !== undefined){
@@ -231,7 +252,7 @@ class DiscorgsContent extends React.Component{
         let artistName = ''
         if(this.state.data.artists !== undefined && this.state.data.artists[0] !== undefined && this.state.data.artists[0].name!==undefined){
             artistName = this.state.data.artists[0].name;
-        }
+        }        
 
         return (<><div className='col-3'><img src={this.state.additionalMedia.image} alt="Album cover" /></div>
         <div className={'col-9 ' + styles.singleAlbumParentContainer}><div className='container'><div className='row'>album</div><div className='row'>
