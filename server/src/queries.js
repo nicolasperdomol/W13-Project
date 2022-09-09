@@ -79,7 +79,6 @@ const saveRelease = (request, response) => {
     
     //Retrieving data
     let data = request.body;
-    console.log(data)
     let id = data[0].id;
 
     //Validating whether release exists in DB
@@ -95,9 +94,11 @@ const saveRelease = (request, response) => {
             //Retrieving tracklist titles only
             let tracklist_data = data[0].tracklist;
             let tracklist = [];
-            for(let i = 0; i < tracklist_data.length; i++){
-                tracklist.push(tracklist_data[i].title);
-            };
+            if(tracklist_data !== undefined){
+                for(let i = 0; i < tracklist_data.length; i++){
+                    tracklist.push(tracklist_data[i].title);
+                };
+            }
         
             //Storing only the first values if category is an array (Ex. artists);
             let params = [JSONObject.playlist_id, JSONObject.id, JSONObject.title, JSONObject.artists[0].name, JSONObject.genres[0], 

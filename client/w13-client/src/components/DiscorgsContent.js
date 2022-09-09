@@ -140,6 +140,15 @@ class DiscorgsContent extends React.Component{
     }
 
     handleOnClickAddAlbum = async(event) =>{
+        //TODO:
+        if(document.getElementById("playlistForm").classList.item(1) === styles.invisible){
+            document.getElementById("playlistForm").classList.remove(styles.invisible);
+            document.getElementById("playlistForm").classList.add(styles.visible);
+        }else{
+            document.getElementById("playlistForm").classList.remove(styles.visible);
+            document.getElementById("playlistForm").classList.add(styles.invisible);
+        }
+        
         let children = event.currentTarget.children;
         let releaseId = parseInt(children.item(0).value);
         for (let elem of document.getElementsByClassName("releaseId")){
@@ -231,7 +240,7 @@ class DiscorgsContent extends React.Component{
             this.setState({albumsJSX:[]})
             let albumJSXArray = []
             const uniqueMaster = {};
-            albumJSXArray.push(<div className='container' key='playlistForm'><div className={'row '}><div className={'col-4 offset-4 '+styles.playlistForm}><div className='container'>
+            albumJSXArray.push(<div className={' container ' + styles.invisible} key='playlistForm' id='playlistForm'><div className={'row '}><div className={'col-4 offset-4 '+styles.playlistForm}><div className='container'>
                 <div className='row' style={{margin:'2% 0 2% 0'}}>Save to...</div></div>
                 {this.state.savedPlaylistsJSX}
                 <div className='row' id='savedPlaylist'></div>

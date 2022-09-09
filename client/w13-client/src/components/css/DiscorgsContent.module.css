@@ -56,3 +56,12 @@
 #filtersRow{
     margin:3% 0% 3% 0%;
 }
+
+
+.invisible{
+    display: none;
+}
+
+.visible{
+    display: inline;
+}
