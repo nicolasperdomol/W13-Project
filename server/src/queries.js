@@ -12,7 +12,6 @@ const getPlaylists = (request, response) => {
         response.writeHead(200, { 'Content-Type' : 'application/json' });
         response.end(JSONObjectString);
     })
-    // db.disconnect(); //TO DO
 } 
 
 /** Retrieves all releases (albums or songs) in playlist */
@@ -37,7 +36,6 @@ const getReleases = (request, response) => {
         response.end('Release ID #' + request.params.id + ' does not exist.');
     }
     });
-    // db.disconnect(); //TO DO
 }
 
 /** Adds playlist in DB */
@@ -99,7 +97,6 @@ const saveRelease = (request, response) => {
             for(let i = 0; i < tracklist_data.length; i++){
                 tracklist.push(tracklist_data[i].title);
             };
-            // let JSONObjectString = JSON.parse
         
             //Storing only the first values if category is an array (Ex. artists);
             let params = [JSONObject.playlist_id, JSONObject.id, JSONObject.title, JSONObject.artists[0].name, JSONObject.genres[0], 
@@ -167,6 +164,7 @@ const removePlaylist = (request, response) => {
     });
 }
 
+//Making functions public
 module.exports = {
     getPlaylists,
     getReleases,
