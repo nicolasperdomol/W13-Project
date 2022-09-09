@@ -2,7 +2,18 @@
 GET http://localhost:8000/playlists HTTP/1.1
 
 ### The GET /playlist/:id
-GET http://localhost:8000/playlists/13814 HTTP/1.1
+GET http://localhost:8000/playlists/1 HTTP/1.1
+
+### The POST /playlist/save
+POST http://localhost:8000/playlists/save HTTP/1.1
+Content-Type: application/json
+
+[
+  {
+    "id": 2,
+    "name": "test2"
+  }
+]
 
 ### The POST /playlist
 POST http://localhost:8000/playlists HTTP/1.1
@@ -10,7 +21,8 @@ Content-Type: application/json
 
 [
   {
-    "id": 12345,
+    "playlist_id": 5,
+    "id": 67892,
     "main_release": 1813006,
     "most_recent_release": 24387593,
     "resource_url": "https://api.discogs.com/masters/13814",
@@ -307,5 +319,8 @@ Content-Type: application/json
   }
 ]
 
-### The DELETE /playlist/:id
-DELETE http://localhost:8000/playlists/13814 HTTP/1.1
+### The DELETE /playlist/:playlist
+DELETE http://localhost:8000/playlists/5 HTTP/1.1
+
+### The DELETE /playlist/:playlist/:album
+DELETE http://localhost:8000/playlists/5/67892 HTTP/1.1
