@@ -6,6 +6,10 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const query = require('./queries');
+// const http = require('http');
+// const server = http.createServer(app);
+// const { Server } = require('socket.io');
+// const io = new Server(server, { cors: { origin: '*' }});
 
 
 //Middleware
@@ -36,3 +40,7 @@ app.delete('/playlists/:playlist', query.removePlaylist);
 app.listen(portNumber, function() {
     console.log('Server listening to port', portNumber);
 })
+
+// io.on('connection', (socket) => {
+
+// })

@@ -33,7 +33,7 @@ const getReleases = (request, response) => {
         response.end(JSONObjectString);
     } else {
         response.writeHead(404, { 'Content-Type': 'text/html' });
-        response.end('Release ID #' + request.params.id + ' does not exist.');
+        response.end('Playlist is empty.');
     }
     });
 }
@@ -53,12 +53,12 @@ const savePlaylist = (request, response) => {
     }
 
     //Validating whether playlist exists in DB
-    db.queryParams('SELECT * FROM public.playlists WHERE id = $1', [id], (result) => {
-        if (result.rowCount == 1) {
-            response.writeHead(404, { 'Content-Type': 'application/json' });
-            let message = JSON.stringify({"message":'Playlist already exists.'})
-            response.end(message);
-        } else {
+    // db.queryParams('SELECT * FROM public.playlists WHERE id = $1', [id], (result) => {
+    //     if (result.rowCount == 1) {
+    //         response.writeHead(404, { 'Content-Type': 'application/json' });
+    //         let message = JSON.stringify({"message":'Playlist already exists.'})
+    //         response.end(message);
+    //     } else {
             let playlist_name = data[0].name;
             db.queryParams('INSERT INTO public.playlists(name) VALUES ($1) ' 
                             + 'RETURNING *', [playlist_name], (result) => {
@@ -67,8 +67,8 @@ const savePlaylist = (request, response) => {
             let message = JSON.stringify({"message": 'Playlist ' + data[0].name + ' was created!'})
             response.end(message);
             });
-        }
-    });
+        // }
+    // });
 }
 
 /** Adds album in DB */

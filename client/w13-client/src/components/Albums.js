@@ -13,7 +13,8 @@ class Albums extends React.Component {
     }
 
     async componentDidMount() {
-        const url = 'http://localhost:8000/playlists';
+        //TODO get playlist ID
+        const url = 'http://localhost:8000/playlists/';
         const response = await fetch(url);
         const data = await response.json();
         this.setState({release_data: data, isLoading: false
