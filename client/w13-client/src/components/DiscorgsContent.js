@@ -21,6 +21,7 @@ class DiscorgsContent extends React.Component{
             inputText:"",
             isLoaded:true,
             data:[],
+            savedPlaylistsJSX:(<div></div>),
             albumsJSX:(<div className='col' id={styles.listenTo}><h1 className='text-center'>What do you want to listen to?</h1><img src={jazzBandIMG} alt="jazz band" /></div>),
             mode:modes.MultipleAlbums,
             filter:"artist",
@@ -30,6 +31,9 @@ class DiscorgsContent extends React.Component{
         }
     }
 
+    componentDidMount(){
+        this.updateSavedPlaylists();
+    }
 
     async componentDidUpdate(prevProps, prevState){
         //TODO: Modify API access, get token and info without sending the key in the URL.
@@ -101,7 +105,6 @@ class DiscorgsContent extends React.Component{
         try {
             const response = await fetch(url)
             const json = await response.json();
-
             this.setState({
                 data:json,
                 mode:modes.SingleAlbum,
@@ -116,75 +119,51 @@ class DiscorgsContent extends React.Component{
         this.setState({filter:event.target.value})
     }
 
-    // handleOnClickAddAlbum = async(event) =>{
-    //     var he = require("he")
-    //     let children = event.currentTarget.children;
-    //     let playlist = {
-    //         "id": children[0].value,
-    //         "title": children[1].value.toLowerCase(),
-    //         "genres": [children[2].value.toLowerCase()],
-    //         "year": children[3].value,
-    //         "uri": he.decode(children[4].value).toLowerCase()
-    //     }
-
-    //     let tracklist = [];
-    //     let artists = "";
-    //     let url = "https://api.discogs.com/masters/" + playlist.id;
-
-    //     //Fetch and get artist and tracklist of selected album.
-    //     try{
-    //         let response = await fetch(url);
-    //         let json = await response.json();
-    //         let isArtistAvailable = json.artists !== undefined;
-    //         let isTracklistAvailable = json.tracklist !== undefined;
-            
-    //         if(isArtistAvailable){
-    //             artists = json.artists;
-    //         }
-    //         if(isTracklistAvailable){
-    //             json.tracklist.forEach((track)=>{
-    //                 tracklist.push(track);
-    //             })
-    //         }
-    
-    //         playlist["artists"] = artists;
-    //         playlist["tracklist"] = tracklist;
-            
-    //         let jsonBody = JSON.stringify([playlist])
-
-    //         url = "http://localhost:8000/playlists"
-    //         response = await fetch(url, {
-    //             method : 'POST',
-    //             mode : 'cors',
-    //             headers:{
-    //                 'Content-type':'application/json'
-    //             },
-    //             body: jsonBody
-    //         });
-
-    //         let ok = response.status === 200;
-    //         json = await response.json()
-    //         this.setState({statusMessage:{
-    //             ok: ok,
-    //             ...json
-    //         }}, ()=>{this.setState({messageJSX: this.getMessageJSX()});})
-           
-            
-            
-    //     }catch(e){
-    //         console.error(e)
-    //     }
-    // }
-
-    handleOnClickAddAlbum = async(event) =>{
+    handleOnClickAddAlbum = (event) =>{
         alert('hola mundo')
     }
 
     handleOnClickNewPlaylist = async(event) =>{
-        let playlistName = document.getElementById("playlistName").value.trim();
-        if(playlistName.length > 0){
-            console.log(playlistName)
+        try{
+            let playlistName = document.getElementById("playlistName").value.trim();
+            if(playlistName.length > 0){
+                let url = "http://localhost:8000/playlists/save"
+                let bodyJSON = JSON.stringify([{id:0, name:playlistName}]);
+                let response = await fetch(url, {
+                    method : 'POST',
+                    mode : 'cors',
+                    headers:{
+                        'Content-type':'application/json'
+                    },
+                    body: bodyJSON
+                });
+                let json = await response.json();
+                this.setState({
+                    statusMessage:{
+                    ok: response.status === 200,
+                    ...json
+                    },
+                })
+                this.updateSavedPlaylists();
+            }
+        }catch(e){
+            console.error(e)
         }
+    }
+
+    updateSavedPlaylists= async()=>{
+        let url = "http://localhost:8000/playlists";
+        let response = await fetch(url);
+        let json = await response.json();
+        let jsx = []
+        json.forEach((tracklist)=>{
+            let row = (<div className='row tracklistElement' key={tracklist.name}><div className='col-1'><input type='checkbox' name={tracklist.name} value='1'/></div><div className='col'><label form={tracklist.name}>{tracklist.name}</label></div></div>)
+            jsx.push(row)
+        })
+        this.setState({
+            savedPlaylistsJSX:jsx,
+            messageJSX:this.getMessageJSX()
+        })
     }
 
     multipleAlbumsJSX = () =>{
@@ -192,11 +171,10 @@ class DiscorgsContent extends React.Component{
             this.setState({albumsJSX:[]})
             let albumJSXArray = []
             const uniqueMaster = {};
-    
-        
-
             albumJSXArray.push(<div className='container' key='playlistForm'><div className={'row '}><div className={'col-4 offset-4 '+styles.playlistForm}><div className='container'>
                 <div className='row'>Save to...</div></div>
+                {this.state.savedPlaylistsJSX}
+                <div className='row' id='savedPlaylist'></div>
                 <div style={{margin:0}} className='row'><input type='text' name='playlistName' id='playlistName'/><button onClick={(event)=>{this.handleOnClickNewPlaylist(event)}}>Create new playlist</button></div>
                 </div></div></div>)
             albumJSXArray.push(<b key="Bold Exploring"><h3 key="Exploring" id={styles.exploring}>Exploring {this.state.inputText}</h3></b>)
@@ -232,12 +210,13 @@ class DiscorgsContent extends React.Component{
                 }
             }
             return albumJSXArray;
+
         }else{
             return (<p>Loading . . .</p>);
         }
     }
 
-    singleAlbumJSX = async() =>{
+    singleAlbumJSX = () =>{
         let tracklist = []
         let index = 1;
         if(this.state.data.message !== undefined){
@@ -253,7 +232,7 @@ class DiscorgsContent extends React.Component{
         if(this.state.data.artists !== undefined && this.state.data.artists[0] !== undefined && this.state.data.artists[0].name!==undefined){
             artistName = this.state.data.artists[0].name;
         }        
-
+        
         return (<><div className='col-3'><img src={this.state.additionalMedia.image} alt="Album cover" /></div>
         <div className={'col-9 ' + styles.singleAlbumParentContainer}><div className='container'><div className='row'>album</div><div className='row'>
             <b className={styles.singleAlbumTitle}><h1>{this.state.data.title}</h1></b>

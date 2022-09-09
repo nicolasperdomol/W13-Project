@@ -6,69 +6,58 @@ class Playlist extends React.Component {
 
         //Setting initial state
         this.state = {
-            release_data: [],
             isLoading: true,
-            dataJSX:[]
+            dataJSX:(<div className='row'>Loading ...</div>),
+            statusMessage:[]
         };
     }
 
-    async componentDidMount() {
-        const url = 'http://localhost:8000/playlists';
-        const response = await fetch(url);
-        const data = await response.json();
-        this.setState({release_data: data, isLoading: false
-        }, ()=>{this.setState({dataJSX:this.setDataJSX()})});
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (nextProps.savedPlaylists !== prevState.savedPlaylists) {
+            return ({ savedPlaylists: nextProps.savedPlaylists })
+        }
+        return null
     }
 
-    setDataJSX = () => {
-        //Setting data
-        const data = this.state.release_data;
+    componentDidUpdate(prevProps, prevState){
+        if((prevState.savedPlaylists !== this.state.savedPlaylists)){
+            this.updateDataJSX()
+        }
+    }
 
-        let table_data = data.map((item) => {
-            return (
-                <tbody key='tableData'><tr key={item.id}>
-                    <td><div><b>{item.title} - {item.artists}</b></div>
-                    <div><b>ID #</b>{item.id}</div>
-                    <div><b>Genre: </b>{item.genres}</div>
-                    <div><b>Year: </b>{item.year}</div>
-                    <div><b>Tracklist</b></div>
-                    <ol>
-                        <div>{item.tracklist.map((item, index) => {
-                            return <li key={index}>{item}</li>
-                        })}</div>
-                    </ol>
-                    <div><b>URI:</b> {item.uri}</div>
-                    <button type="button">Remove</button>
-                </td></tr></tbody>
-            )
+    handleOnClickRemovePlaylist = async(event)=>{
+        let playlistId = event.currentTarget.children.item(0).value
+        let url = 'http://localhost:8000/playlists/' + playlistId;
+        let response = await fetch(url, {
+                    method : 'DELETE',
+                    mode : 'cors',
+                });
+        let json = await response.json();
+        console.log(json)
+    }
+
+    updateDataJSX(){
+        let jsx = [];
+        this.state.savedPlaylists.map((playlist)=>{
+            jsx.push(<div className='row' key={playlist.name + playlist.id}>
+                    <div className='col-10'>{playlist.name}</div>
+                    <div className='col-2'><button onClick={(event)=>{this.handleOnClickRemovePlaylist(event)}} style={{color:'white', border:'none', background:'none'}}><input type='hidden' name='id' value={playlist.id}/>x</button></div>
+                </div>)
+            return true
         })
-        return table_data;
+        this.setState({dataJSX:jsx})
     }
 
     render() {
-        //Setting message if still loading
-        if(this.state.isLoaded) {
-            return <div>Loading...</div>
-        }
-
-        //Setting message if data is yet to be retrieved
-        if(!this.state.release_data) {
-            return<div>Waiting for data...</div>
-        }
-
         return (
             <div style={{color:'white'}}>
                 <h1>My Playlist</h1>
-                <table >
+                <div className='container'>
                     {this.state.dataJSX}
-                </table>
+                </div>
             </div>
         )
-
-
     }
-
-
 }
 
 export default Playlist;

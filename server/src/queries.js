@@ -48,7 +48,11 @@ const savePlaylist = (request, response) => {
     
     //Retrieving data
     let data = request.body;
-    let id = data[0].id
+    let id = 0;
+
+    if(data[0].id !== undefined){
+        id = data[0].id
+    }
 
     //Validating whether playlist exists in DB
     db.queryParams('SELECT * FROM public.playlists WHERE id = $1', [id], (result) => {
@@ -150,13 +154,15 @@ const removePlaylist = (request, response) => {
         //Deleting playlist
         if(result.rowCount == 0) {
             db.queryParams('DELETE FROM public.playlists WHERE id = $1', params, (result) => {    
-                response.writeHead(200, { 'Content-Type': 'text/html'});
-                response.end('Playlist was deleted.');
+                response.writeHead(200, { 'Content-Type': 'application/json'});
+                let message = JSON.stringify({message:'Playlist was deleted.'})
+                response.end(message);
             });   
 
         } else {
-            response.writeHead(402, { 'Content-Type': 'text/html'});
-            response.end('Playlist does not exist.');
+            response.writeHead(404, { 'Content-Type': 'application/json'});
+            let message = JSON.stringify({message:'Playlist does not exist.'})
+            response.end(message);
         }
     });
 }
