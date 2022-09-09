@@ -32,8 +32,8 @@ const getReleases = (request, response) => {
         response.writeHead(200, { 'Content-Type': 'application/json' });
         response.end(JSONObjectString);
     } else {
-        response.writeHead(404, { 'Content-Type': 'text/html' });
-        response.end('Playlist is empty.');
+        response.writeHead(404, { 'Content-Type': 'application/json' });
+        response.end({message:"Playlist is empty."});
     }
     });
 }
@@ -53,22 +53,22 @@ const savePlaylist = (request, response) => {
     }
 
     //Validating whether playlist exists in DB
-    // db.queryParams('SELECT * FROM public.playlists WHERE id = $1', [id], (result) => {
-    //     if (result.rowCount == 1) {
-    //         response.writeHead(404, { 'Content-Type': 'application/json' });
-    //         let message = JSON.stringify({"message":'Playlist already exists.'})
-    //         response.end(message);
-    //     } else {
+    db.queryParams('SELECT * FROM public.playlists WHERE id = $1', [id], (result) => {
+        if (result.rowCount == 1) {
+            response.writeHead(404, { 'Content-Type': 'application/json' });
+            let message = JSON.stringify({message:'Playlist already exists.'})
+            response.end(message);
+        } else {
             let playlist_name = data[0].name;
             db.queryParams('INSERT INTO public.playlists(name) VALUES ($1) ' 
                             + 'RETURNING *', [playlist_name], (result) => {
                 
             response.writeHead(200, { 'Content-Type': 'application/json' });
-            let message = JSON.stringify({"message": 'Playlist ' + data[0].name + ' was created!'})
+            let message = JSON.stringify({message: 'Playlist ' + data[0].name + ' was created!'})
             response.end(message);
             });
-        // }
-    // });
+        }
+    });
 }
 
 /** Adds album in DB */
@@ -79,13 +79,17 @@ const saveRelease = (request, response) => {
     
     //Retrieving data
     let data = request.body;
-    let id = data[0].id;
+    let id = 0;
+
+    if(data[0].id !== undefined){
+        id = data[0].id
+    }
 
     //Validating whether release exists in DB
     db.queryParams('SELECT * FROM public.albums WHERE playlist_id = $1', [id], (result) => {
         if (result.rowCount == 1) {
             response.writeHead(404, { 'Content-Type': 'application/json' });
-            let message = JSON.stringify({"message":'Release is already in playlist.'})
+            let message = JSON.stringify({message:'Release is already in playlist.'})
             response.end(message);
         } else {
             //Always retrieving one object (album or song) at a time
@@ -127,13 +131,13 @@ const removeAlbum = (request, response) => {
         if(result.rowCount == 1) {
             let params = [request.params.playlist, request.params.album];
             db.queryParams('DELETE FROM public.albums WHERE playlist_id = $1 AND release_id = $2', params, (result) => {    
-                response.writeHead(200, { 'Content-Type': 'text/html'});
-                response.end('Release was deleted.');
+                response.writeHead(200, { 'Content-Type': 'application/json'});
+                response.end({message:"Release was deleted."});
             });   
 
         } else {
-            response.writeHead(402, { 'Content-Type': 'text/html'});
-            response.end('Release ID #' + request.params.id + ' does not exist.');
+            response.writeHead(402, { 'Content-Type': 'application/json'});
+            response.end({message:"Release ID #" + request.params.id + "does not exist."});
         }
     });
 }
