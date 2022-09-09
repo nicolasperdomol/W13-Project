@@ -86,7 +86,11 @@ const saveRelease = (request, response) => {
     }
     let playlist_id = data[0].playlist_id;
 
-    //Validating whether release exists in DB
+    if(data[0].playlist_id !== undefined) {
+        playlist_id = data[0].playlist_id;
+    }
+
+    //Validating whether release exists in playlist
     db.queryParams('SELECT * FROM public.albums WHERE playlist_id = $1 AND release_id = $2', [playlist_id, id], (result) => {
         if (result.rowCount == 1) {
             response.writeHead(404, { 'Content-Type': 'application/json' });

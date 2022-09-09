@@ -10,7 +10,7 @@ Content-Type: application/json
 
 [
   {
-    "name": "test10"
+    "name": ""
   }
 ]
 
@@ -20,7 +20,7 @@ Content-Type: application/json
 
 [
   {
-    "playlist_id": 5,
+    "playlist_id": 9,
     "id": 67892,
     "main_release": 1813006,
     "most_recent_release": 24387593,
@@ -319,7 +319,7 @@ Content-Type: application/json
 ]
 
 ### The DELETE /playlist/:playlist
-DELETE http://localhost:8000/playlists/6 HTTP/1.1
+DELETE http://localhost:8000/playlists/9 HTTP/1.1
 
 ### The DELETE /playlist/:playlist/:album
 DELETE http://localhost:8000/playlists/5/67892 HTTP/1.1
