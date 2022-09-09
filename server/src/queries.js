@@ -86,7 +86,7 @@ const saveRelease = (request, response) => {
     }
 
     //Validating whether release exists in DB
-    db.queryParams('SELECT * FROM public.albums WHERE playlist_id = $1', [id], (result) => {
+    db.queryParams('SELECT * FROM public.albums  WHERE playlist_id = $1', [playlist_id], (result) => {
         if (result.rowCount == 1) {
             response.writeHead(404, { 'Content-Type': 'application/json' });
             let message = JSON.stringify({message:'Release is already in playlist.'})
