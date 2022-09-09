@@ -79,6 +79,7 @@ const saveRelease = (request, response) => {
     
     //Retrieving data
     let data = request.body;
+    console.log(data)
     let id = data[0].id;
 
     //Validating whether release exists in DB
@@ -106,7 +107,7 @@ const saveRelease = (request, response) => {
                            ' VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)' + 'RETURNING *', params, (result) => {
                 
             response.writeHead(200, { 'Content-Type': 'application/json' });
-            let message = JSON.stringify({"message":JSONObject.title + ' was added in playlist!'})
+            let message = JSON.stringify({message:JSONObject.title + ' was added in playlist!'})
             response.end(message);
             });
         }

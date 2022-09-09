@@ -1,7 +1,7 @@
 import "./App.css"
 import Navbar from "./components/Navbar";
-import MainContent from "./components/MainContent";
 import Playlists from './components/Playlists'
+import DiscorgsContent from './components/DiscorgsContent'
 import React from "react";
 
 class App extends React.Component {
@@ -37,8 +37,12 @@ class App extends React.Component {
                         <Playlists savedPlaylists={this.state.savedPlaylists}/>
                     </div>
                 </div>
-                <div className="col" style={{backgroundColor:"#1c1c1c", minHeight:"100vh"}}>
-                    <MainContent/>
+                <div className="col" style={{backgroundColor:"#1c1c1c", minHeight:"100vh", color:'white'}}>
+                    <div className='container'>
+                        <div className='row'>
+                            <div className={'col DiscorgsContent'}><DiscorgsContent savedPlaylists={this.state.savedPlaylists}/></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
