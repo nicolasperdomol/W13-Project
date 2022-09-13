@@ -1,63 +1,65 @@
 import "./App.css";
 import Playlists from "./components/Playlists";
 import DiscorgsContent from "./components/DiscorgsContent";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
+function App() {
+  const [savedPlaylists, setSavedPlaylists] = useState([]);
+  useEffect(() => {
+    //Set async function
+    const getSavedPlaylists = async () => {
+      let url = "http://localhost:8000/playlists";
+      try {
+        let response = await fetch(url);
+        let json = await response.json();
 
-    //Setting initial state
-    this.state = {
-      savedPlaylists: [],
-      loading: true,
+        if (savedPlaylists.length !== json.length) {
+          setSavedPlaylists(json);
+        }
+      } catch (e) {
+        console.error(e);
+      }
     };
-  }
 
-  getSavedPlaylists = async () => {
-    let url = "http://localhost:8000/playlists";
-    let response = await fetch(url);
-    let json = await response.json();
-    this.setState({ savedPlaylists: json, loading: false });
-  };
+    //Call async function
+    getSavedPlaylists();
+  }, [savedPlaylists]);
 
-  componentDidMount() {
-    this.getSavedPlaylists();
-  }
-
-  render() {
-    return (
-      <div className="App">
-        <div className="container">
-          <div className="row">
-            <div id="navbar" className="col-2">
-              <div className="col">
-                <Playlists savedPlaylists={this.state.savedPlaylists} />
-              </div>
+  return (
+    <div className="App">
+      <div className="container">
+        <div className="row">
+          <div id="navbar" className="col-2">
+            <div className="col">
+              <Playlists
+                savedPlaylists={savedPlaylists}
+                setSavedPlaylists={setSavedPlaylists}
+              />
             </div>
-            <div
-              className="col"
-              style={{
-                backgroundColor: "#1c1c1c",
-                minHeight: "100vh",
-                color: "white",
-              }}
-            >
-              <div className="container">
-                <div className="row">
-                  <div className={"col DiscorgsContent"}>
-                    <DiscorgsContent
-                      savedPlaylists={this.state.savedPlaylists}
-                    />
-                  </div>
+          </div>
+          <div
+            className="col"
+            style={{
+              backgroundColor: "#1c1c1c",
+              minHeight: "100vh",
+              color: "white",
+            }}
+          >
+            <div className="container">
+              <div className="row">
+                <div className={"col DiscorgsContent"}>
+                  <DiscorgsContent
+                    savedPlaylists={savedPlaylists}
+                    setSavedPlaylists={setSavedPlaylists}
+                  />
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 export default App;

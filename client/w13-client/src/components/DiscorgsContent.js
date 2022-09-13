@@ -57,8 +57,11 @@ class DiscorgsContent extends React.Component {
         "'&format='album'&key=VUOrRLOIOnctmQdwiGKg&secret=YscHuQtQIOwyYKJapjStsQOKtQIfGNvF";
     }
     try {
-      let playlistJSX = [];
-      if (prevState.savedPlaylists !== this.state.savedPlaylists) {
+      if (
+        prevProps.savedPlaylists.length !== this.props.savedPlaylists.length ||
+        this.props.savedPlaylists.length === 0
+      ) {
+        let playlistJSX = [];
         this.state.savedPlaylists.map((tracklist) => {
           let row = (
             <div className="row tracklistElement" key={tracklist.name}>
@@ -92,7 +95,17 @@ class DiscorgsContent extends React.Component {
           playlistJSX.push(row);
           return true;
         });
-        this.setState({ savedPlaylistsJSX: playlistJSX });
+        if (playlistJSX.length !== 0) {
+          this.setState({
+            savedPlaylistsJSX: playlistJSX,
+            albumsJSX: (
+              <div className="col" id={styles.listenTo}>
+                <h1 className="text-center">What do you want to listen to?</h1>
+                <img src={jazzBandIMG} alt="jazz band" />
+              </div>
+            ),
+          });
+        }
       }
 
       if (prevState.statusMessage !== this.state.statusMessage) {
@@ -221,6 +234,10 @@ class DiscorgsContent extends React.Component {
           body: bodyJSON,
         });
         let json = await response.json();
+
+        //Update savedPlaylists
+        this.props.setSavedPlaylists([]);
+
         this.setState({
           statusMessage: {
             ok: response.status === 200,
