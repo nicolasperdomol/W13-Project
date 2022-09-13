@@ -10,10 +10,11 @@ const getPlaylists = (request, response) => {
     let JSONObjectString = JSON.stringify(JSONObject, null, 4);
     response.writeHead(200, { "Content-Type": "application/json" });
     response.end(JSONObjectString);
+    
+    //Disconnecting from DB
+    db.disconnect();
   });
 
-  //Disconnecting from DB
-  db.disconnect();
 };
 
 /** Retrieves all releases (albums or songs) in playlist */
@@ -37,11 +38,12 @@ const getReleases = (request, response) => {
         response.writeHead(404, { 'Content-Type': 'application/json' });
         let message = JSON.stringify({message:"Playlist is empty."});
         response.end(message);
+    
     }
+        //Disconnecting from DB
+        db.disconnect();
     });
 
-    //Disconnecting from DB
-    db.disconnect();
 };
 
 /** Adds playlist in DB */
@@ -76,11 +78,10 @@ const savePlaylist = (request, response) => {
           }
         );
       }
-    }
-  );
+      //Disconnecting from DB
+      db.disconnect();
+    });
 
-  //Disconnecting from DB
-  db.disconnect();
 };
 
 /** Adds album in DB */
@@ -152,11 +153,11 @@ const saveRelease = (request, response) => {
           }
         );
       }
-    }
-  );
+      
+      //Disconnecting from DB
+      db.disconnect();
+    });
 
-  //Disconnecting from DB
-  db.disconnect();
 };
 
 /** Removes album from DB */
@@ -185,11 +186,11 @@ const removeAlbum = (request, response) => {
           message: "Release ID #" + request.params.id + "does not exist.",
         });
       }
-    }
-  );
 
-  //Disconnecting from DB
-  db.disconnect();
+      //Disconnecting from DB
+      db.disconnect();
+    });
+
 };
 
 /** Removes playlist from DB */
@@ -223,10 +224,11 @@ const removePlaylist = (request, response) => {
             let message = JSON.stringify({message:'Playlist does not exist.'})
             response.end(message);
         }
+
+        //Disconnecting from DB
+        db.disconnect();
     });
 
-    //Disconnecting from DB
-    db.disconnect();
 };
 
 //Making functions public

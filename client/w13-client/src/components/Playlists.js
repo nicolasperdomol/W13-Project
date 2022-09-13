@@ -1,4 +1,5 @@
 import React from "react";
+import Albums from "./Albums";
 
 class Playlist extends React.Component {
   constructor(props) {
@@ -40,14 +41,18 @@ class Playlist extends React.Component {
   };
 
   handleOnClickPlaylist = async (event) => {
+    // let playlistId = event.currentTarget.children.item(0).value;
+    // let url = "http://localhost:8000/playlists/" + playlistId;
+    // let response = await fetch(url, {
+    //   method: "GET",
+    //   mode: "cors",
+    // });
+    // let json = await response.json();
+    // console.log(json);
     let playlistId = event.currentTarget.children.item(0).value;
-    let url = "http://localhost:8000/playlists/" + playlistId;
-    let response = await fetch(url, {
-      method: "GET",
-      mode: "cors",
-    });
-    let json = await response.json();
-    console.log(json);
+    console.log(playlistId);
+
+    return <Albums id={playlistId} />
   }
 
   updateDataJSX() {

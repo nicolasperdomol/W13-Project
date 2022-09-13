@@ -6,7 +6,7 @@ class Albums extends React.Component {
 
         //Setting initial state
         this.state = {
-            release_data: [],
+            data: [],
             isLoading: true,
             dataJSX:[]
         };
