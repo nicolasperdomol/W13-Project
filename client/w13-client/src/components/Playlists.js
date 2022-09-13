@@ -1,4 +1,5 @@
 import React from "react";
+import Albums from "./Albums";
 
 class Playlist extends React.Component {
   constructor(props) {
@@ -19,6 +20,7 @@ class Playlist extends React.Component {
     return null;
   }
 
+  //If state has changed, the state will be updated
   componentDidUpdate(prevProps, prevState) {
     if (prevState.savedPlaylists !== this.state.savedPlaylists) {
       this.updateDataJSX();
@@ -38,12 +40,34 @@ class Playlist extends React.Component {
     }
   };
 
+  handleOnClickPlaylist = async (event) => {
+    // let playlistId = event.currentTarget.children.item(0).value;
+    // let url = "http://localhost:8000/playlists/" + playlistId;
+    // let response = await fetch(url, {
+    //   method: "GET",
+    //   mode: "cors",
+    // });
+    // let json = await response.json();
+    // console.log(json);
+    let playlistId = event.currentTarget.children.item(0).value;
+    console.log(playlistId);
+
+    return <Albums id={playlistId} />
+  }
+
   updateDataJSX() {
     let jsx = [];
     this.state.savedPlaylists.map((playlist) => {
       jsx.push(
         <div className="row" key={playlist.name + playlist.id}>
-          <div className="col-10">{playlist.name}</div>
+          <div className="col-10">
+            <button onClick={(event) => {
+              this.handleOnClickPlaylist(event);
+            }}
+            style={{ color: "white", border: "none", background: "none" }}>{playlist.name}
+            <input type="hidden" name="id" value={playlist.id}/>
+            </button>
+          </div>
           <div className="col-2">
             <button
               onClick={(event) => {
@@ -58,7 +82,7 @@ class Playlist extends React.Component {
       );
       return true;
     });
-    this.setState({ dataJSX: jsx });
+    this.setState({ dataJSX: jsx, isLoading: false });
   }
 
   render() {
