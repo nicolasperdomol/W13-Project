@@ -87,7 +87,7 @@ class DiscorgsContent extends React.Component {
                     name="playlistId"
                     value={tracklist.id}
                   />
-                  +
+                  <b>+</b>
                 </button>
               </div>
             </div>
@@ -198,19 +198,8 @@ class DiscorgsContent extends React.Component {
   };
 
   handleOnClickAddAlbum = async (event) => {
-    //TODO:
-    if (
-      document.getElementById("playlistForm").classList.item(1) ===
-      styles.invisible
-    ) {
-      document
-        .getElementById("playlistForm")
-        .classList.remove(styles.invisible);
-      document.getElementById("playlistForm").classList.add(styles.visible);
-    } else {
-      document.getElementById("playlistForm").classList.remove(styles.visible);
-      document.getElementById("playlistForm").classList.add(styles.invisible);
-    }
+    document.getElementById("playlistForm").classList.remove(styles.invisible);
+    document.getElementById("playlistForm").classList.add(styles.visible);
 
     let children = event.currentTarget.children;
     let releaseId = parseInt(children.item(0).value);
@@ -324,13 +313,48 @@ class DiscorgsContent extends React.Component {
             <div className={"col-4 offset-4 " + styles.playlistForm}>
               <div className="container">
                 <div className="row" style={{ margin: "2% 0 2% 0" }}>
-                  Save to...
+                  <div className="col">
+                    <b
+                      style={{
+                        textDecoration: "underline",
+                        margin: "2% 0 1% 0",
+                      }}
+                    >
+                      Save to...
+                    </b>
+                  </div>
+                  <div className="col-2">
+                    <button
+                      onClick={() => {
+                        document
+                          .getElementById("playlistForm")
+                          .classList.remove(styles.visible);
+                        document
+                          .getElementById("playlistForm")
+                          .classList.add(styles.invisible);
+                      }}
+                      style={{
+                        backgroundColor: "white",
+                        color: "black",
+                        borderRadius: "50%",
+                        width: "30px",
+                        height: "30px",
+                      }}
+                    >
+                      <b>x</b>
+                    </button>
+                  </div>
                 </div>
               </div>
               {this.state.savedPlaylistsJSX}
               <div className="row" id="savedPlaylist"></div>
               <div style={{ margin: 0 }} className="row">
-                <input type="text" name="playlistName" id="playlistName" />
+                <input
+                  type="text"
+                  name="playlistName"
+                  id="playlistName"
+                  style={{ marginTop: "10%" }}
+                />
                 <button
                   onClick={(event) => {
                     this.handleOnClickNewPlaylist(event);
