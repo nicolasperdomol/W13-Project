@@ -23,17 +23,16 @@ const getReleases = (request, response) => {
     
     //Retrieving parameters
     let params = [request.params.id];
-    db.queryParams('SELECT playlist_id, release_id, title, artists, genres, year, tracklist, uri' +
-                   ' FROM public.albums WHERE playlist_id = $1', params, (result) => {    
-
-    //If exists, retrieves all releases in playlist
-    if(result.rowCount == 1) {
-        let JSONObject = result.rows;
-        let JSONObjectString = JSON.stringify(JSONObject, null, 4);
-
-        response.writeHead(200, { 'Content-Type': 'application/json' });
-        response.end(JSONObjectString);
-    } else {
+    db.queryParams('SELECT * FROM public.albums WHERE playlist_id = $1', params, (result) => {    
+        //If exists, retrieves all releases in playlist
+        if(result.rowCount >= 1) {
+            let JSONObject = result.rows;
+            let JSONObjectString = JSON.stringify(JSONObject, null, 4);
+            
+            response.writeHead(200, { 'Content-Type': 'application/json' });
+            response.end(JSONObjectString);
+        } else {
+        console.log(params);
         response.writeHead(404, { 'Content-Type': 'application/json' });
         let message = JSON.stringify({message:"Playlist is empty."});
         response.end(message);
@@ -159,15 +158,21 @@ const removePlaylist = (request, response) => {
     
     //Deleting content of playlist
     db.queryParams('DELETE FROM public.albums WHERE playlist_id = $1', params, (result) => {
-        
+        console.log(result);
         //Deleting playlist
-        if(result.rowCount == 0) {
+        if(result.rowCount >= 1) {
             db.queryParams('DELETE FROM public.playlists WHERE id = $1', params, (result) => {    
-                response.writeHead(200, { 'Content-Type': 'application/json'});
-                let message = JSON.stringify({message:'Playlist was deleted.'})
-                response.end(message);
-            });   
-
+                
+                if (result.rowCount == 1) {
+                    response.writeHead(200, { 'Content-Type': 'application/json'});
+                    let message = JSON.stringify({message:'Playlist was deleted.'})
+                    response.end(message);
+                } else {
+                    response.writeHead(404, { 'Content-Type': 'application/json'});
+                    let message = JSON.stringify({message:'An error occured. The playlist was not deleted.'})
+                    response.end(message);
+                }
+            });
         } else {
             response.writeHead(404, { 'Content-Type': 'application/json'});
             let message = JSON.stringify({message:'Playlist does not exist.'})

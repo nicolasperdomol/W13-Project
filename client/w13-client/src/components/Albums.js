@@ -39,6 +39,7 @@ class Albums extends React.Component {
                         })}</div>
                     </ol>
                     <div><b>URI:</b> {item.uri}</div>
+                    <div><button type="button">Remove from playlist</button></div>
                 </td></tr></tbody>
             )
         })
