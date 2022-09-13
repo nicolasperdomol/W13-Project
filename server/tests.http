@@ -10,7 +10,7 @@ Content-Type: application/json
 
 [
   {
-    "name": "test99"
+    "name": "test3"
   }
 ]
 
@@ -20,8 +20,8 @@ Content-Type: application/json
 
 [
   {
-    "playlist_id": 10,
-    "id": 67892,
+    "playlist_id": 18,
+    "id": 789,
     "main_release": 1813006,
     "most_recent_release": 24387593,
     "resource_url": "https://api.discogs.com/masters/13814",

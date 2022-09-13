@@ -13,12 +13,23 @@ class Albums extends React.Component {
     }
 
     async componentDidMount() {
-        //TODO get playlist ID
-        const url = 'http://localhost:8000/playlists/';
+        //TODO get ID
+        const url = 'http://localhost:8000/playlists/16';
         const response = await fetch(url);
         const data = await response.json();
         this.setState({release_data: data, isLoading: false
         }, ()=>{this.setState({dataJSX:this.setDataJSX()})});
+    }
+
+
+    onDeleteAlbum = async() => {
+        let albumId = this.state.data.id; //TODO
+        let url = 'http://localhost:8000/playlists/' + albumId;
+        let response = await fetch(url, {
+            method: 'DELETE',
+            mode: 'cors',
+        })
+        console.log(response);
     }
 
     setDataJSX = () => {
@@ -39,7 +50,7 @@ class Albums extends React.Component {
                         })}</div>
                     </ol>
                     <div><b>URI:</b> {item.uri}</div>
-                    <div><button type="button">Remove from playlist</button></div>
+                    <div><button type="button" onClick={(event) => {this.onDeleteAlbum(event)}}>Remove from playlist</button></div>
                 </td></tr></tbody>
             )
         })

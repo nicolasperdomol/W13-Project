@@ -11,6 +11,9 @@ const getPlaylists = (request, response) => {
     response.writeHead(200, { "Content-Type": "application/json" });
     response.end(JSONObjectString);
   });
+
+  //Disconnecting from DB
+  db.disconnect();
 };
 
 /** Retrieves all releases (albums or songs) in playlist */
@@ -36,7 +39,10 @@ const getReleases = (request, response) => {
         response.end(message);
     }
     });
-}
+
+    //Disconnecting from DB
+    db.disconnect();
+};
 
 /** Adds playlist in DB */
 const savePlaylist = (request, response) => {
@@ -53,18 +59,14 @@ const savePlaylist = (request, response) => {
 
   //Validating whether playlist exists in DB
   db.queryParams(
-    "SELECT * FROM public.playlists WHERE id = $1",
-    [id],
-    (result) => {
+    "SELECT * FROM public.playlists WHERE id = $1", [id], (result) => {
       if (result.rowCount == 1) {
         response.writeHead(404, { "Content-Type": "application/json" });
         let message = JSON.stringify({ message: "Playlist already exists." });
         response.end(message);
       } else {
         let playlist_name = data[0].name;
-        db.queryParams(
-          "INSERT INTO public.playlists(name) VALUES ($1) " + "RETURNING *",
-          [playlist_name],
+        db.queryParams("INSERT INTO public.playlists(name) VALUES ($1) " + "RETURNING *", [playlist_name],
           (result) => {
             response.writeHead(200, { "Content-Type": "application/json" });
             let message = JSON.stringify({
@@ -76,6 +78,9 @@ const savePlaylist = (request, response) => {
       }
     }
   );
+
+  //Disconnecting from DB
+  db.disconnect();
 };
 
 /** Adds album in DB */
@@ -149,6 +154,9 @@ const saveRelease = (request, response) => {
       }
     }
   );
+
+  //Disconnecting from DB
+  db.disconnect();
 };
 
 /** Removes album from DB */
@@ -179,6 +187,9 @@ const removeAlbum = (request, response) => {
       }
     }
   );
+
+  //Disconnecting from DB
+  db.disconnect();
 };
 
 /** Removes playlist from DB */
@@ -192,7 +203,7 @@ const removePlaylist = (request, response) => {
     
     //Deleting content of playlist
     db.queryParams('DELETE FROM public.albums WHERE playlist_id = $1', params, (result) => {
-        console.log(result);
+        
         //Deleting playlist
         if(result.rowCount >= 1) {
             db.queryParams('DELETE FROM public.playlists WHERE id = $1', params, (result) => {    
@@ -213,7 +224,10 @@ const removePlaylist = (request, response) => {
             response.end(message);
         }
     });
-}
+
+    //Disconnecting from DB
+    db.disconnect();
+};
 
 //Making functions public
 module.exports = {
