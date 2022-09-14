@@ -280,17 +280,16 @@ class DiscorgsContent extends React.Component {
           },
           body: bodyJSON,
         });
+        console.log(response);
         let json = await response.json();
-
-        //Update savedPlaylists
-        this.props.setSavedPlaylists([]);
-
         this.setState({
           statusMessage: {
             ok: response.status === 200,
             ...json,
           },
         });
+        //Update savedPlaylists
+        this.props.setSavedPlaylists([]);
       }
     } catch (e) {
       console.error(e);

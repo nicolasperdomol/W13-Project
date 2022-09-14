@@ -75,7 +75,7 @@ const savePlaylist = (request, response) => {
           [playlist_name],
           (result) => {
             response.writeHead(200, { "Content-Type": "application/json" });
-            let message = JSON.stringify({
+            json = JSON.stringify({
               message: "Playlist " + data[0].name + " was created!",
             });
             response.end(message);
@@ -84,6 +84,14 @@ const savePlaylist = (request, response) => {
       }
       //Disconnecting from DB
       db.disconnect();
+
+      response.writeHead(200, { "Content-Type": "application/json" });
+      response.end(
+        JSON.stringify({
+          ok: true,
+          message: "Playlist " + data[0].name + " was created!",
+        })
+      );
     }
   );
 };
