@@ -52,8 +52,8 @@ class Playlist extends React.Component {
     let playlistId = event.currentTarget.children.item(0).value;
     console.log(playlistId);
 
-    return <Albums id={playlistId} />
-  }
+    return <Albums id={playlistId} />;
+  };
 
   updateDataJSX() {
     let jsx = [];
@@ -61,11 +61,19 @@ class Playlist extends React.Component {
       jsx.push(
         <div className="row" key={playlist.name + playlist.id}>
           <div className="col-10">
-            <button onClick={(event) => {
-              this.handleOnClickPlaylist(event);
-            }}
-            style={{ color: "white", border: "none", background: "none" }}>{playlist.name}
-            <input type="hidden" name="id" value={playlist.id}/>
+            <button
+              onClick={(event) => {
+                this.handleOnClickPlaylist(event);
+              }}
+              style={{ color: "white", border: "none", background: "none" }}
+            >
+              <a
+                style={{ color: "white", textDecoration: "none" }}
+                href={"http://localhost:8000/playlists/" + playlist.id}
+              >
+                {playlist.name}
+              </a>
+              <input type="hidden" name="id" value={playlist.id} />
             </button>
           </div>
           <div className="col-2">
