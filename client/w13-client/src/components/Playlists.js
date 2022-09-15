@@ -7,7 +7,7 @@ class Playlist extends React.Component {
     //Setting initial state
     this.state = {
       isLoading: true,
-      dataJSX: <div className="row">Loading ...</div>,
+      dataJSX: <div className="row">No playlist yet . . .</div>,
       statusMessage: [],
     };
   }
