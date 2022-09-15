@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import Albums from "./components/Albums";
 
 function App() {
+  const [playlistId, setPlaylistId] = useState(0);
   const [savedPlaylists, setSavedPlaylists] = useState([]);
   useEffect(() => {
     //Set async function
@@ -26,42 +27,53 @@ function App() {
     getSavedPlaylists();
   }, [savedPlaylists]);
 
-  return (
-    <div className="App">
-      <div className="container">
-        <div className="row">
-          <div id="navbar" className="col-2">
-            <div className="col">
-              <Playlists
-                savedPlaylists={savedPlaylists}
-                setSavedPlaylists={setSavedPlaylists}
-              />
+  // useEffect(() => {
+  //   console.log(playlistId);
+  // }, [playlistId]);
+
+  if (playlistId === 0) {
+    return (
+      <div className="App">
+        <div className="container">
+          <div className="row">
+            <div id="navbar" className="col-2">
+              <div className="col">
+                <Playlists
+                  savedPlaylists={savedPlaylists}
+                  playlistId={playlistId}
+                  setSavedPlaylists={setSavedPlaylists}
+                  setPlaylistId={setPlaylistId}
+                />
+              </div>
             </div>
-          </div>
-          <div
-            className="col"
-            style={{
-              backgroundColor: "#1c1c1c",
-              minHeight: "100vh",
-              color: "white",
-            }}
-          >
-            <div className="container">
-              <div className="row">
-                <div className={"col DiscorgsContent"}>
-                  <DiscorgsContent
-                    savedPlaylists={savedPlaylists}
-                    setSavedPlaylists={setSavedPlaylists}
-                  />
-                  {/* <Albums playlistId={16}/> */}
+            <div
+              className="col"
+              style={{
+                backgroundColor: "#1c1c1c",
+                minHeight: "100vh",
+                color: "white",
+              }}
+            >
+              <div className="container">
+                <div className="row">
+                  <div className={"col DiscorgsContent"}>
+                    <DiscorgsContent
+                      playlistId={playlistId}
+                      savedPlaylists={savedPlaylists}
+                      setSavedPlaylists={setSavedPlaylists}
+                    />
+                    {/* <Albums playlistId={16}/> */}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  } else {
+    return <Albums playlistId={playlistId} setPlaylistId={setPlaylistId} />;
+  }
 }
 
 export default App;

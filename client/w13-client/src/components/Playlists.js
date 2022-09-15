@@ -19,6 +19,14 @@ class Playlist extends React.Component {
     return null;
   }
 
+  componentDidMount() {
+    if (this.props.playlistId === 0) {
+      this.setState({ dataJSX: [] }, () => {
+        this.updateDataJSX();
+      });
+    }
+  }
+
   //If state has changed, the state will be updated
   componentDidUpdate(prevProps, prevState) {
     if (prevState.savedPlaylists !== this.state.savedPlaylists) {
@@ -33,28 +41,31 @@ class Playlist extends React.Component {
       method: "DELETE",
       mode: "cors",
     });
-    let json = await response.json();
+    //let json = await response.json();
     if (response.status === 200) {
       this.props.setSavedPlaylists([]);
+      this.setState({ dataJSX: [] }, () => {
+        this.setState({ dataJSX: this.updateDataJSX() });
+      });
     }
-    console.log(json);
   };
 
   //TODO display Albums component OR use routes to display another page
   handleOnClickPlaylist = async (event) => {
     let playlistId = event.currentTarget.children.item(0).value;
-    console.log(playlistId); //For testing purposes
-    let url = "http://localhost:8000/playlists/" + playlistId;
-    let response = await fetch(url, {
-      method: "GET",
-      mode: "cors",
-    });
+    // //console.log(playlistId); //For testing purposes
+    // let url = "http://localhost:8000/playlists/" + playlistId;
+    // let response = await fetch(url, {
+    //   method: "GET",
+    //   mode: "cors",
+    // });
 
-    if (response.status === 200) {
-      let json = await response.json();
-      console.log(json); //For testing purposes
-    }
-  }
+    // if (response.status === 200) {
+    //   let json = await response.json();
+    //   //console.log(json); //For testing purposes
+    // }
+    this.props.setPlaylistId(playlistId);
+  };
 
   updateDataJSX() {
     let jsx = [];
@@ -62,12 +73,15 @@ class Playlist extends React.Component {
       jsx.push(
         <div className="row" key={playlist.name + playlist.id}>
           <div className="col-10">
-            <button onClick={(event) => {
-              this.handleOnClickPlaylist(event);
-            }}
-            style={{ color: "white", border: "none", background: "none" }}>{playlist.name}
-            <input type="hidden" name="id" value={playlist.id} />
-            <input type="hidden" name="playlistName" value={playlist.name} />
+            <button
+              onClick={(event) => {
+                this.handleOnClickPlaylist(event);
+              }}
+              style={{ color: "white", border: "none", background: "none" }}
+            >
+              {playlist.name}
+              <input type="hidden" name="id" value={playlist.id} />
+              <input type="hidden" name="playlistName" value={playlist.name} />
             </button>
           </div>
           <div className="col-2">

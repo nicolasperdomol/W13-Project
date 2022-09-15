@@ -78,6 +78,60 @@ class DiscorgsContent extends React.Component {
     return null;
   }
 
+  updateSavedPlaylistsJSX = () => {
+    let playlistJSX = [];
+    this.state.savedPlaylists.map((tracklist) => {
+      let row = (
+        <div className="row tracklistElement" key={tracklist.name}>
+          <div className="col">
+            <span>{tracklist.name}</span>
+          </div>
+          <div className="col-2">
+            <button
+              onClick={(event) => {
+                this.handleOnClickAddInPlaylist(event);
+              }}
+              style={{
+                margin: "0.5% 0 0.5% 0",
+                background: "none",
+                color: "white",
+                border: "none",
+              }}
+            >
+              <input type="hidden" className="releaseId" name="releaseId" />
+              <input
+                type="hidden"
+                className="playlistId"
+                name="playlistId"
+                value={tracklist.id}
+              />
+              <b>+</b>
+            </button>
+          </div>
+        </div>
+      );
+      playlistJSX.push(row);
+      return true;
+    });
+    if (playlistJSX.length !== 0) {
+      this.setState({
+        savedPlaylistsJSX: playlistJSX,
+        albumsJSX: (
+          <div className="col" id={styles.listenTo}>
+            <h1 className="text-center">What do you want to listen to?</h1>
+            <img src={jazzBandIMG} alt="jazz band" />
+          </div>
+        ),
+      });
+    }
+  };
+
+  componentDidMount() {
+    if (this.props.playlistId === 0) {
+      this.updateSavedPlaylistsJSX();
+    }
+  }
+
   async componentDidUpdate(prevProps, prevState) {
     //TODO: Modify API access, get token and info without sending the key in the URL.
     let url =
@@ -95,51 +149,7 @@ class DiscorgsContent extends React.Component {
         prevProps.savedPlaylists.length !== this.props.savedPlaylists.length ||
         this.props.savedPlaylists.length === 0
       ) {
-        let playlistJSX = [];
-        this.state.savedPlaylists.map((tracklist) => {
-          let row = (
-            <div className="row tracklistElement" key={tracklist.name}>
-              <div className="col">
-                <span>{tracklist.name}</span>
-              </div>
-              <div className="col-2">
-                <button
-                  onClick={(event) => {
-                    this.handleOnClickAddInPlaylist(event);
-                  }}
-                  style={{
-                    margin: "0.5% 0 0.5% 0",
-                    background: "none",
-                    color: "white",
-                    border: "none",
-                  }}
-                >
-                  <input type="hidden" className="releaseId" name="releaseId" />
-                  <input
-                    type="hidden"
-                    className="playlistId"
-                    name="playlistId"
-                    value={tracklist.id}
-                  />
-                  <b>+</b>
-                </button>
-              </div>
-            </div>
-          );
-          playlistJSX.push(row);
-          return true;
-        });
-        if (playlistJSX.length !== 0) {
-          this.setState({
-            savedPlaylistsJSX: playlistJSX,
-            albumsJSX: (
-              <div className="col" id={styles.listenTo}>
-                <h1 className="text-center">What do you want to listen to?</h1>
-                <img src={jazzBandIMG} alt="jazz band" />
-              </div>
-            ),
-          });
-        }
+        this.updateSavedPlaylistsJSX();
       }
 
       if (prevState.statusMessage !== this.state.statusMessage) {
@@ -280,7 +290,6 @@ class DiscorgsContent extends React.Component {
           },
           body: bodyJSON,
         });
-        console.log(response);
         let json = await response.json();
         this.setState({
           statusMessage: {
