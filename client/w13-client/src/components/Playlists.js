@@ -33,10 +33,11 @@ class Playlist extends React.Component {
       method: "DELETE",
       mode: "cors",
     });
-    //let json = await response.json();
+    let json = await response.json();
     if (response.status === 200) {
       this.props.setSavedPlaylists([]);
     }
+    console.log(json);
   };
 
   //TODO display Albums component OR use routes to display another page

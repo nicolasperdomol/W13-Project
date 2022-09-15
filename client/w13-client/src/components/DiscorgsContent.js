@@ -10,10 +10,15 @@ class DiscorgsContent extends React.Component {
    * @property {string} inputText Text typed by the user in the search bar client application.
    * @property {boolean} isLoaded Indicates if the app did received all the data from a previous fetch or not.
    * @property {array} data Holds the information retrieved from a fetch request as JSON.
+   * @property {array} savedPlaylists saved playlists passed as a property from parent class App, contains info about our own API
+   * @property {JSX} savedPlaylistsJSX to display the information stored in savedPlaylists as JSX.
    * @property {JSX} albumsJSX Main source of what we will display to the user, depends on [data] and [mode].
    * @property {enum} mode Affects albumsJSX in the way we will display the information [MultipleAlbums: in a grid with 4 columns / SingleAlbum: col-12 full width of the page]
+   * @property {string} filter filter passed to fetch https://api.discorgs...
    * @property {string} additionalMedia Images and other relevant data that are not found in the new data.
+   * @property {object} statusMessage Used to display useful information to the user.
    * @property {object} message Alert message for the user, object{ok: (boolean) Success state or not, message:(string) data}
+   * @property {object} dicorgsRateLimitUsed Stores counters of requests made to disocgs API; use endpoints of the same API as field names.
    */
   constructor(props) {
     super(props);
@@ -34,8 +39,37 @@ class DiscorgsContent extends React.Component {
       additionalMedia: [],
       statusMessage: {},
       messageJSX: <div></div>,
+      dicorgsRateLimitUsed: {
+        search: 0,
+        masters: 0,
+      },
     };
   }
+
+  resetAPIRequests = async (fieldName, requestLimit) => {
+    if (this.state.dicorgsRateLimitUsed[fieldName] >= requestLimit) {
+      this.setState({
+        statusMessage: {
+          ok: false,
+          message: "Too many requests, please wait 60 seconds",
+        },
+      });
+      const refreshTime = 60000;
+      await this.timeOutPromise(refreshTime);
+      this.setState({
+        statusMessage: {
+          ok: true,
+          message: "Thanks for waiting!",
+        },
+      });
+    }
+  };
+
+  timeOutPromise = (msTime) => {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve, msTime);
+    });
+  };
 
   static getDerivedStateFromProps(nextProps, prevState) {
     if (nextProps.savedPlaylists !== prevState.savedPlaylists) {
@@ -87,7 +121,7 @@ class DiscorgsContent extends React.Component {
                     name="playlistId"
                     value={tracklist.id}
                   />
-                  +
+                  <b>+</b>
                 </button>
               </div>
             </div>
@@ -117,6 +151,7 @@ class DiscorgsContent extends React.Component {
       let isEmptyInputText = this.state.inputText.length !== 0;
       //Runs the first time asign JSON to data.
       if (isDataStateEmpty && isEmptyInputText) {
+        this.resetAPIRequests("search", 55);
         const response = await fetch(url);
         const json = await response.json();
         this.setState(
@@ -129,6 +164,7 @@ class DiscorgsContent extends React.Component {
 
             //Runs only AFTER this.setState has finished, similar to await this.setState
             this.setState({ albumsJSX: this.updateAlbumsJSX() });
+            this.addOneInDicorgsRateLimit("search");
           }
         );
       } else if (hasInputTextChanged) {
@@ -137,6 +173,7 @@ class DiscorgsContent extends React.Component {
           this.setState({ mode: modes.MultipleAlbums });
         }
         this.setState({ isLoaded: false });
+        this.resetAPIRequests("search", 55);
         const response = await fetch(url);
         const json = await response.json();
         this.setState(
@@ -146,6 +183,7 @@ class DiscorgsContent extends React.Component {
           },
           () => {
             this.setState({ albumsJSX: this.updateAlbumsJSX() });
+            this.addOneInDicorgsRateLimit("search");
           }
         );
       } else if (prevState.mode !== this.state.mode) {
@@ -155,6 +193,22 @@ class DiscorgsContent extends React.Component {
       console.error(e);
     }
   }
+
+  addOneInDicorgsRateLimit = (fieldName) => {
+    let newdicorgsRateLimitUsed = {};
+
+    for (const val in this.state.dicorgsRateLimitUsed) {
+      if (val === fieldName) {
+        newdicorgsRateLimitUsed[val] = this.state.dicorgsRateLimitUsed[val] + 1;
+      } else {
+        newdicorgsRateLimitUsed[val] = this.state.dicorgsRateLimitUsed[val];
+      }
+    }
+
+    this.setState({
+      dicorgsRateLimitUsed: newdicorgsRateLimitUsed,
+    });
+  };
 
   /**
    *
@@ -181,13 +235,17 @@ class DiscorgsContent extends React.Component {
 
     let url = "https://api.discogs.com/masters/" + masterId;
     try {
+      this.resetAPIRequests("masters", 22);
       const response = await fetch(url);
       const json = await response.json();
-      this.setState({
-        data: json,
-        mode: modes.SingleAlbum,
-        additionalMedia: { image: thumbSource },
-      });
+      this.setState(
+        {
+          data: json,
+          mode: modes.SingleAlbum,
+          additionalMedia: { image: thumbSource },
+        },
+        this.addOneInDicorgsRateLimit("masters")
+      );
     } catch (e) {
       console.error(e);
     }
@@ -198,19 +256,8 @@ class DiscorgsContent extends React.Component {
   };
 
   handleOnClickAddAlbum = async (event) => {
-    //TODO:
-    if (
-      document.getElementById("playlistForm").classList.item(1) ===
-      styles.invisible
-    ) {
-      document
-        .getElementById("playlistForm")
-        .classList.remove(styles.invisible);
-      document.getElementById("playlistForm").classList.add(styles.visible);
-    } else {
-      document.getElementById("playlistForm").classList.remove(styles.visible);
-      document.getElementById("playlistForm").classList.add(styles.invisible);
-    }
+    document.getElementById("playlistForm").classList.remove(styles.invisible);
+    document.getElementById("playlistForm").classList.add(styles.visible);
 
     let children = event.currentTarget.children;
     let releaseId = parseInt(children.item(0).value);
@@ -233,17 +280,16 @@ class DiscorgsContent extends React.Component {
           },
           body: bodyJSON,
         });
+        console.log(response);
         let json = await response.json();
-
-        //Update savedPlaylists
-        this.props.setSavedPlaylists([]);
-
         this.setState({
           statusMessage: {
             ok: response.status === 200,
             ...json,
           },
         });
+        //Update savedPlaylists
+        this.props.setSavedPlaylists([]);
       }
     } catch (e) {
       console.error(e);
@@ -273,6 +319,7 @@ class DiscorgsContent extends React.Component {
 
       //Fetch for more information [artists, tracklist]
       let url = "https://api.discogs.com/masters/" + releaseId;
+      this.resetAPIRequests("masters", 22);
       let response = await fetch(url);
       let json = await response.json();
       album["artists"] = json.artists;
@@ -289,12 +336,15 @@ class DiscorgsContent extends React.Component {
         body: JSON.stringify([album]),
       });
       json = await response.json();
-      this.setState({
-        statusMessage: {
-          ok: response.status === 200,
-          ...json,
-        },
-      });
+      this.setState(
+        {
+          statusMessage: {
+            ok: response.status === 200,
+            ...json,
+          },
+        }
+        //this.addOneInDicorgsRateLimit("masters")
+      );
     }
   };
 
@@ -324,13 +374,48 @@ class DiscorgsContent extends React.Component {
             <div className={"col-4 offset-4 " + styles.playlistForm}>
               <div className="container">
                 <div className="row" style={{ margin: "2% 0 2% 0" }}>
-                  Save to...
+                  <div className="col">
+                    <b
+                      style={{
+                        textDecoration: "underline",
+                        margin: "2% 0 1% 0",
+                      }}
+                    >
+                      Save to...
+                    </b>
+                  </div>
+                  <div className="col-2">
+                    <button
+                      onClick={() => {
+                        document
+                          .getElementById("playlistForm")
+                          .classList.remove(styles.visible);
+                        document
+                          .getElementById("playlistForm")
+                          .classList.add(styles.invisible);
+                      }}
+                      style={{
+                        backgroundColor: "white",
+                        color: "black",
+                        borderRadius: "50%",
+                        width: "30px",
+                        height: "30px",
+                      }}
+                    >
+                      <b>x</b>
+                    </button>
+                  </div>
                 </div>
               </div>
               {this.state.savedPlaylistsJSX}
               <div className="row" id="savedPlaylist"></div>
               <div style={{ margin: 0 }} className="row">
-                <input type="text" name="playlistName" id="playlistName" />
+                <input
+                  type="text"
+                  name="playlistName"
+                  id="playlistName"
+                  style={{ marginTop: "10%" }}
+                />
                 <button
                   onClick={(event) => {
                     this.handleOnClickNewPlaylist(event);
