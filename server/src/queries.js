@@ -214,9 +214,6 @@ const removeAlbum = (request, response) => {
 const removePlaylist = (request, response) => {
   //Connecting to DB
   db.connect();
-
-  console.log("In remove playlists");
-
   //Retrieving parameters
   let params = [request.params.playlist];
 
@@ -225,7 +222,6 @@ const removePlaylist = (request, response) => {
     params,
     (result) => {
       if (result.rowCount > 0) {
-        console.log("Number of songs in playlist: ", result.rowCount);
         //Deleting content of playlist
         db.queryParams(
           "DELETE FROM public.albums WHERE playlist_id = $1",
