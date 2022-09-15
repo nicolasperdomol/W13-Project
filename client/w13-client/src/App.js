@@ -2,6 +2,7 @@ import "./App.css";
 import Playlists from "./components/Playlists";
 import DiscorgsContent from "./components/DiscorgsContent";
 import React, { useEffect, useState } from "react";
+import Albums from "./components/Albums";
 
 function App() {
   const [savedPlaylists, setSavedPlaylists] = useState([]);
@@ -52,6 +53,7 @@ function App() {
                     savedPlaylists={savedPlaylists}
                     setSavedPlaylists={setSavedPlaylists}
                   />
+                  {/* <Albums playlistId={16}/> */}
                 </div>
               </div>
             </div>

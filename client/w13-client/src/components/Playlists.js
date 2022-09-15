@@ -1,5 +1,4 @@
 import React from "react";
-import Albums from "./Albums";
 
 class Playlist extends React.Component {
   constructor(props) {
@@ -40,19 +39,20 @@ class Playlist extends React.Component {
     }
   };
 
+  //TODO display Albums component OR use routes to display another page
   handleOnClickPlaylist = async (event) => {
-    // let playlistId = event.currentTarget.children.item(0).value;
-    // let url = "http://localhost:8000/playlists/" + playlistId;
-    // let response = await fetch(url, {
-    //   method: "GET",
-    //   mode: "cors",
-    // });
-    // let json = await response.json();
-    // console.log(json);
     let playlistId = event.currentTarget.children.item(0).value;
-    console.log(playlistId);
+    console.log(playlistId); //For testing purposes
+    let url = "http://localhost:8000/playlists/" + playlistId;
+    let response = await fetch(url, {
+      method: "GET",
+      mode: "cors",
+    });
 
-    return <Albums id={playlistId} />
+    if (response.status === 200) {
+      let json = await response.json();
+      console.log(json); //For testing purposes
+    }
   }
 
   updateDataJSX() {
@@ -65,7 +65,8 @@ class Playlist extends React.Component {
               this.handleOnClickPlaylist(event);
             }}
             style={{ color: "white", border: "none", background: "none" }}>{playlist.name}
-            <input type="hidden" name="id" value={playlist.id}/>
+            <input type="hidden" name="id" value={playlist.id} />
+            <input type="hidden" name="playlistName" value={playlist.name} />
             </button>
           </div>
           <div className="col-2">

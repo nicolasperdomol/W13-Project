@@ -34,8 +34,7 @@ const getReleases = (request, response) => {
             response.writeHead(200, { 'Content-Type': 'application/json' });
             response.end(JSONObjectString);
         } else {
-        console.log(params);
-        response.writeHead(404, { 'Content-Type': 'application/json' });
+        response.writeHead(204, { 'Content-Type': 'application/json' });
         let message = JSON.stringify({message:"Playlist is empty."});
         response.end(message);
     

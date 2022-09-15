@@ -1,4 +1,6 @@
 import React from 'react';
+import addMusicImage from '../imgs/addMusic.svg';
+import style from './css/AlbumsContent.module.css';
 
 class Albums extends React.Component {
     constructor(props) {
@@ -6,55 +8,107 @@ class Albums extends React.Component {
 
         //Setting initial state
         this.state = {
-            data: [],
+            playlist_data: [],
             isLoading: true,
-            dataJSX:[]
+            dataJSX: [],
+            message: "",
+            playlistId: this.props.playlistId //TODO get playlist ID
         };
     }
 
-    async componentDidMount() {
-        //TODO get ID
-        const url = 'http://localhost:8000/playlists/16';
-        const response = await fetch(url);
-        const data = await response.json();
-        this.setState({release_data: data, isLoading: false
-        }, ()=>{this.setState({dataJSX:this.setDataJSX()})});
+
+    componentDidMount() {
+        this.getData();
     }
 
+    //If playlist length have changed, the state is updated
+    componentDidUpdate(prevProps, prevState) {
+        if (prevState.playlist_data.length !== this.state.playlist_data.length) {
+            this.getData();
+        }
+    }
+    
+    getData = async () => {
+        let playlistId = this.state.playlistId;
+        let url = 'http://localhost:8000/playlists/' + playlistId;
+        let response = await fetch(url, {
+            method: "GET",
+            mode: "cors"
+        });
+        if (response.status === 200) {
+            let data = await response.json();
+            console.log(data);
+            this.setState({playlist_data: data, isLoading: false, dataJSX: this.setDataJSX(), message: ""})
+        } else {
+            this.setState({dataJSX: this.setDataJSX()});
+            console.log(response.statusText);
+        }
+        
+    }
+    
+    handleOnImageClick = async () => {
+        console.log('Redirecting to search page'); //TODO redirect page
+    }
 
-    onDeleteAlbum = async() => {
-        let albumId = this.state.data.id; //TODO
-        let url = 'http://localhost:8000/playlists/' + albumId;
+    handleOnDeleteAlbum = async (event) => {
+        let albumId = event.target.value;
+        let playlistId = this.state.playlistId;
+        let url = 'http://localhost:8000/playlists/' + playlistId + '/' + albumId;
         let response = await fetch(url, {
             method: 'DELETE',
             mode: 'cors',
         })
-        console.log(response);
-    }
+        if (response.status === 200) {
+            console.log(response);
+            this.setState({message: "Album removed!"}) //TODO get response msg
+        } else {
+            console.log(response.statusText);
+        }
+    };
 
     setDataJSX = () => {
         //Setting data
-        const data = this.state.release_data;
-
-        let table_data = data.map((item) => {
-            return (
-                <tbody key='tableData'><tr key={item.release_id}>
-                    <td><div><b>{item.title} - {item.artists}</b></div>
-                    <div><b>ID #</b>{item.id}</div>
-                    <div><b>Genre: </b>{item.genres}</div>
-                    <div><b>Year: </b>{item.year}</div>
-                    <div><b>Tracklist</b></div>
-                    <ol>
-                        <div>{item.tracklist.map((item, index) => {
-                            return <li key={index}>{item}</li>
-                        })}</div>
-                    </ol>
-                    <div><b>URI:</b> {item.uri}</div>
-                    <div><button type="button" onClick={(event) => {this.onDeleteAlbum(event)}}>Remove from playlist</button></div>
-                </td></tr></tbody>
+        const data = this.state.playlist_data;
+        console.log(data);
+        let content = [];
+        if (data.length === 0 || data === null) {
+            content = (
+                <div>
+                    <img src={addMusicImage} 
+                        alt="add music" 
+                        title="Add music" 
+                        className={style.img}
+                        onClick={() => this.handleOnImageClick()}
+                    />
+                </div>
             )
-        })
-        return table_data;
+            this.setState({message: "Playlist is empty... Add some music!", dataJSX: content});
+
+        } else {
+
+            content = data.map((item) => {
+                return (
+                    <tbody key='tableData'><tr key={item.release_id}>
+                        <td>
+                        <img src={item.image_url} alt={item.artists} />
+                        <div><b>{item.title} - {item.artists}</b></div>
+                        <div><b>ID #</b>{item.release_id}</div>
+                        <div><b>Genre: </b>{item.genres}</div>
+                        <div><b>Year: </b>{item.year}</div>
+                        <div><b>Tracklist</b></div>
+                        <ol>
+                            <div>{item.tracklist.map((item, index) => {
+                                return <li key={index}>{item}</li>
+                            })}</div>
+                        </ol>
+                        <div><b>URI:</b> {item.uri}</div>
+                        <div><button value={item.release_id} onClick={(event) => {this.handleOnDeleteAlbum(event)}}>Remove from playlist</button></div>
+                    </td></tr></tbody>
+                )
+            })
+        }
+
+        return content;
     }
 
     render() {
@@ -64,23 +118,20 @@ class Albums extends React.Component {
         }
 
         //Setting message if data is yet to be retrieved
-        if(!this.state.release_data) {
+        if(!this.state.playlist_data) {
             return<div>Waiting for data...</div>
         }
 
         return (
             <div style={{color:'white'}}>
                 <h1>My Playlist</h1>
-                <table >
-                    {this.state.dataJSX}
-                </table>
+                    <p>{this.state.message}</p>
+                    <table>
+                        {this.state.dataJSX}
+                    </table>
             </div>
         )
-
-
     }
-
-
 }
 
 export default Albums;
