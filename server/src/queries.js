@@ -131,18 +131,22 @@ const saveRelease = (request, response) => {
         //Retrieving tracklist titles only
         let tracklist_data = data[0].tracklist;
         let tracklist = [];
-        if (tracklist_data !== undefined) {
+        if (tracklist_data !== undefined && tracklist_data !== undefined) {
           for (let i = 0; i < tracklist_data.length; i++) {
             tracklist.push(tracklist_data[i].title);
           }
         }
 
+        let artist = [];
+        if (JSONObject.artists !== undefined) {
+          artist = JSONObject.artists[0].name;
+        }
         //Storing only the first values if category is an array (Ex. artists);
         let params = [
           JSONObject.playlist_id,
           JSONObject.id,
           JSONObject.title,
-          JSONObject.artists[0].name,
+          artist,
           JSONObject.genres[0],
           JSONObject.year,
           tracklist,
