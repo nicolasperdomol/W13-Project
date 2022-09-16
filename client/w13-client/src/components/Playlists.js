@@ -50,20 +50,9 @@ class Playlist extends React.Component {
     }
   };
 
-  //TODO display Albums component OR use routes to display another page
+  //Setting playlist ID
   handleOnClickPlaylist = async (event) => {
     let playlistId = event.currentTarget.children.item(0).value;
-    // //console.log(playlistId); //For testing purposes
-    // let url = "http://localhost:8000/playlists/" + playlistId;
-    // let response = await fetch(url, {
-    //   method: "GET",
-    //   mode: "cors",
-    // });
-
-    // if (response.status === 200) {
-    //   let json = await response.json();
-    //   //console.log(json); //For testing purposes
-    // }
     this.props.setPlaylistId(playlistId);
   };
 

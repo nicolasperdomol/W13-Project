@@ -2,7 +2,7 @@
 GET http://localhost:8000/playlists HTTP/1.1
 
 ### The GET /playlist/:id
-GET http://localhost:8000/playlists/20 HTTP/1.1
+GET http://localhost:8000/playlists/24 HTTP/1.1
 
 ### The POST /playlist/save
 POST http://localhost:8000/playlists/save HTTP/1.1
@@ -20,7 +20,7 @@ Content-Type: application/json
 
 [
   {
-    "playlist_id": 20,
+    "playlist_id": 24,
     "id": 789,
     "main_release": 1813006,
     "most_recent_release": 24387593,
@@ -322,4 +322,4 @@ Content-Type: application/json
 DELETE http://localhost:8000/playlists/20 HTTP/1.1
 
 ### The DELETE /playlist/:playlist/:album
-DELETE http://localhost:8000/playlists/5/67892 HTTP/1.1
+DELETE http://localhost:8000/playlists/24/789 HTTP/1.1

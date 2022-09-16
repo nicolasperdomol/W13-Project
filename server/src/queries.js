@@ -33,10 +33,9 @@ const getReleases = (request, response) => {
             response.writeHead(200, { "Content-Type": "application/json" });
             response.end(JSONObjectString);
         } else {
-        response.writeHead(200, { "Content-Type": "application/json" });
-        let message = JSON.stringify({message:"Playlist is empty."});
-        response.end(message);
-      }
+          response.writeHead(204, { "Content-Type": "application/json" });
+          response.end();
+        }
       //Disconnecting from DB
       db.disconnect();
     }
@@ -186,8 +185,19 @@ const removeAlbum = (request, response) => {
           "DELETE FROM public.albums WHERE playlist_id = $1 AND release_id = $2",
           params,
           (result) => {
-            response.writeHead(200, { "Content-Type": "application/json" });
-            response.end({ message: "Release was deleted." });
+
+            //Disconnecting from DB
+            db.disconnect();
+            
+            if (result.rowCount == 1) {
+              response.writeHead(200, { "Content-Type": "application/json" });
+              let message = JSON.stringify({ message: "Release was deleted." });
+              response.end(message);
+            } else {
+              response.writeHead(500, { "Content-Type": "application/json" });
+              let message = JSON.stringify({ message: "An error occured. Release was not deleted." })
+              response.end(message);
+            }
           }
         );
       } else {
@@ -196,9 +206,6 @@ const removeAlbum = (request, response) => {
           message: "Release ID #" + request.params.id + "does not exist.",
         });
       }
-
-      //Disconnecting from DB
-      db.disconnect();
     }
   );
 };

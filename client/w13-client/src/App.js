@@ -62,7 +62,6 @@ function App() {
                       savedPlaylists={savedPlaylists}
                       setSavedPlaylists={setSavedPlaylists}
                     />
-                    {/* <Albums playlistId={16}/> */}
                   </div>
                 </div>
               </div>
