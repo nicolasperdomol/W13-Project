@@ -78,15 +78,19 @@ class Albums extends React.Component {
     let content = [];
     if (data.length === 0 || data === []) {
       content = (
-        <div>
-          <img
-            src={addMusicImage}
-            alt="add music"
-            title="Add music"
-            className={style.img}
-            onClick={() => this.handleOnImageClick()}
-          />
-        </div>
+        <tbody>
+          <tr>
+            <td>
+              <img
+                src={addMusicImage}
+                alt="add music"
+                title="Add music"
+                className={style.img}
+                onClick={() => this.handleOnImageClick()}
+              />
+            </td>
+          </tr>
+        </tbody>
       );
       this.setState({
         message: "Playlist is empty. Look for some music to add!",
