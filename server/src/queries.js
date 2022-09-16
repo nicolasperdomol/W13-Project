@@ -168,9 +168,6 @@ const saveRelease = (request, response) => {
           }
         );
       }
-
-      //Disconnecting from DB
-      // db.disconnect();
     }
   );
 };
