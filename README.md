@@ -25,3 +25,14 @@ Then go to the react app folder, install the modules and run the app.
   npm install
   npm start
 ```
+
+For the client, go to the server folder and install the dependencies.
+
+```bash
+  npm install
+```
+
+To run the server, go to the server folder and run the app.
+```bash
+  npm start
+```
